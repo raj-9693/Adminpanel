@@ -1,0 +1,69 @@
+/* Hover & transition effects — sabse last me import hota hai (main.jsx) */
+
+.nav__item, .btn-add, .btn-primary, .btn-outline, .select-btn, .icon-btn, .tab, .segmented__btn,
+.pill, .dots-btn, .pager__btn, .bell, .user, .search, .field__input, .field__eye, .link, .field__link,
+.list__item, .wedding, .date-box, .stat, .card, .table tbody tr, .phone, .avatar {
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease,
+              box-shadow .25s ease, transform .2s ease, opacity .2s ease, filter .2s ease;
+}
+
+/* Sidebar */
+.nav__item:hover { background: var(--blush-light); color: var(--ink); transform: translateX(3px); }
+.nav__item.is-active:hover { background: var(--sand-soft); }
+.nav__item:hover svg { color: var(--maroon); }
+
+/* Primary buttons */
+.btn-add:hover, .btn-primary:hover { background: #6a2b38; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(123, 52, 66, 0.28); }
+.btn-add:active, .btn-primary:active { transform: translateY(0); box-shadow: none; }
+
+/* Secondary buttons */
+.btn-outline:hover, .select-btn:hover { background: var(--blush-light); border-color: var(--blush); transform: translateY(-1px); }
+.icon-btn:hover { background: var(--blush-light); }
+.dots-btn:hover { background: var(--blush-light); color: var(--ink); }
+
+/* Links */
+.link:hover, .field__link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.field__eye:hover { color: var(--maroon); }
+
+/* Topbar */
+.bell:hover { background: var(--sand-soft); border-color: var(--blush); transform: translateY(-1px); }
+.user { padding: 4px 8px; border-radius: 12px; cursor: pointer; }
+.user:hover { background: var(--sand-soft); }
+.search:hover, .search:focus-within { border-color: var(--maroon); background: var(--cream); }
+.field__input:hover { border-color: var(--blush); }
+
+/* Cards (dashboard) */
+.stat:hover { transform: translateY(-4px); box-shadow: 0 10px 26px rgba(80, 40, 30, 0.12); }
+.row-2 .card:hover { box-shadow: 0 10px 26px rgba(80, 40, 30, 0.1); }
+
+/* Charts */
+.bars rect { transition: opacity .2s ease, filter .2s ease; }
+.bars rect:hover { opacity: .8; filter: drop-shadow(0 4px 6px rgba(123, 52, 66, 0.3)); }
+.donut-wrap circle { transition: stroke-width .2s ease, opacity .2s ease; }
+.donut-wrap circle:hover { stroke-width: 17; }
+.pipeline__bar div { transition: opacity .2s ease; }
+.pipeline__bar div:hover { opacity: .75; }
+.legend span { transition: color .2s ease; cursor: default; }
+.legend span:hover { color: var(--ink); }
+
+/* Lists */
+.list__item:hover .list__name, .wedding:hover .list__name { color: var(--maroon); }
+.wedding:hover .date-box { background: var(--blush); transform: scale(1.05); }
+.list__item:hover .link { transform: translateX(3px); }
+
+/* Bookings page */
+.tab:hover { color: var(--maroon); }
+.tab:hover .tab__count { background: var(--blush); }
+.segmented__btn:hover:not(.is-active) { color: var(--ink); background: rgba(255, 255, 255, 0.55); }
+.table tbody tr:hover { background: #fbf1e7; }
+.pill:hover { filter: brightness(0.95); transform: translateY(-1px); }
+.pill--quote:hover { filter: brightness(1.12); }
+.phone:hover { color: var(--maroon); }
+.phone:hover svg { transform: scale(1.12); }
+.pager__btn--wide:hover { background: var(--blush-light); color: var(--ink); }
+.pager__num:hover:not(.is-active) { background: var(--blush-light); }
+.pager__btn:hover:not(.is-active) { transform: translateY(-1px); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; transform: none !important; }
+}
