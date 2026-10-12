@@ -1,7 +1,7 @@
 const express=require("express")
 
 const router=express.Router()
-const {PostDeta}=require("../Controllers/Homecontrollers")
+const {PostDeta}=require("../Controllers/Gallerycontrollers")
 
 router.get("/postDeta",PostDeta)
 

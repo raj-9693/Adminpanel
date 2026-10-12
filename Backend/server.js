@@ -5,6 +5,9 @@ const RoutesHome=require("./Src/routers/Homerouter")
 const Routesgallery=require("./Src/routers/Galleryrouter")
 const RoutesServices=require("./Src/routers/Servicesrouter")
 const RoutesAbout=require("./Src/routers/Aboutrouter")
+const RoutersContact=require("./Src/routers/ContactRouter")
+const RoutersBooking=require("./Src/routers/Bookingrouter")
+const RouterReviews=require("./Src/routers/Reviewsrouter")
 
 const MongoDB=require("./Src/Config/DB")
 
@@ -14,6 +17,9 @@ app.use("/Api/Home",RoutesHome)
 app.use("/Api/gallery",Routesgallery)
 app.use("/Api/services",RoutesServices)
 app.use("/Api/about",RoutesAbout)
+app.use("/Api/contact",RoutersContact)
+app.use("/Api/booking",RoutersBooking)
+app.use("/Api/Reviews",RouterReviews)
 
 
 

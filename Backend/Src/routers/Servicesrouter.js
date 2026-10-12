@@ -1,11 +1,11 @@
 const express= require("express")
 
-const {Services}=require("../Controllers/Servicescontrollers")
+const {PostDeta}=require("../Controllers/Servicescontrollers")
 
 
 const router=express.Router()
 
-router.post("/PostDeta",Services)
+router.post("/PostDeta",PostDeta)
 
-module.exports=router;
+module.exports=router ; 
 
