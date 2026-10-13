@@ -6,7 +6,13 @@ const PostDeta = async (req, res) => {
   if (
     !data.titalPrime ||
     !data.titalTech ||
-    !data.titalBase 
+    !data.titalBase ||
+
+    !data.titalheader||
+    !data.titaldes||
+
+    !data.processSteps||
+    !data.artistsCard
     
   ) {
     return res
@@ -19,7 +25,13 @@ const PostDeta = async (req, res) => {
       titalPrime: data.titalPrime,
       titalTech: data.titalTech,
       titalBase: data.titalBase,
-      
+
+      profiles: data.profiles,
+      titalheader: data.titalheader,
+      titaldes: data.titaldes,
+
+      processSteps: data.processSteps,
+      artistsCard: data.artistsCard,
     });
 
     return res.status(201).json({
@@ -32,5 +44,19 @@ const PostDeta = async (req, res) => {
   }
 };
 
-module.exports={PostDeta}
+const GetDeta = async (req, res) => {
+  try {
+    const Deta = await ReviewsDeta.find()
+
+    return res.status(200).json({
+      success: true,
+      message: "Deta Sends Sucessfull",
+      Reviews: Deta,
+    })
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message })
+  }
+}
+
+module.exports={PostDeta, GetDeta}
 

@@ -1,6 +1,8 @@
 
 const HomesDeta=require("../../Src/models/HomeSchema")
 
+
+// Post methods
 const PostDeta = async (req, res) => {
   const data = req.body;
 
@@ -37,5 +39,28 @@ const PostDeta = async (req, res) => {
   }
 };
 
+// Get deta
+const GetDeta = async (req, res) => {
+  try {
+    const Deta = await HomesDeta.find();
 
-module.exports={PostDeta}
+    return res.status(200).json({
+      success: true,
+      message: "Deta Sucessful send",
+      homedeta: Deta,
+    });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+
+
+
+
+module.exports={PostDeta,GetDeta}

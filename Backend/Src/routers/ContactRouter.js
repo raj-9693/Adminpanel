@@ -1,8 +1,9 @@
 const express=require("express")
 
-const {PostDeta}=require("../Controllers/Contactcontrollers")
+const {PostDeta,GetDeta}=require("../Controllers/Contactcontrollers")
 
  const router=express.Router()
- router.post("/PostDeta",PostDeta)
+ router.post("/postDeta",PostDeta)
+ router.get("/getDeta",GetDeta)
 
  module.exports=router

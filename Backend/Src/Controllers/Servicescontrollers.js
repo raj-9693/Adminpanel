@@ -6,19 +6,33 @@ const PostDeta = async (req, res) => {
   if (
     !data.titalPrime ||
     !data.titalTech ||
-    !data.titalBase 
+    !data.titalBase ||
+    
+     // Arrays deta
+    !data.cards||
+    !data.tableRows
+   
+    
     
   ) {
     return res
       .status(400)
-      .json({ success: false, message: "All fields are required" });
+      .json({ success: false, message: "All fields are required Raj bahi " });
   }
 
   try {
     const Deta = await servicesDeta.create({
+
+       
+   
       titalPrime: data.titalPrime,
       titalTech: data.titalTech,
       titalBase: data.titalBase,
+
+     cards: data.cards,
+     tableRows: data.tableRows,
+
+             
       
     });
 
@@ -32,5 +46,19 @@ const PostDeta = async (req, res) => {
   }
 };
 
-module.exports={PostDeta}
+const GetDeta = async (req, res) => {
+  try {
+    const Deta = await servicesDeta.find()
+
+    return res.status(200).json({
+      success: true,
+      message: "Deta Sends Sucessfull",
+      Services: Deta,
+    })
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message })
+  }
+}
+
+module.exports={PostDeta, GetDeta}
 

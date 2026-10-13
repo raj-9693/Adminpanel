@@ -33,5 +33,19 @@ const PostDeta = async (req, res) => {
   }
 };
 
-module.exports={PostDeta}
+const GetDeta = async (req, res) => {
+  try {
+    const Deta = await galleryDeta.find()
+
+    return res.status(200).json({
+      success: true,
+      message: "Deta Sends Sucessfull",
+      Gallery: Deta,
+    })
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message })
+  }
+}
+
+module.exports={PostDeta, GetDeta}
 

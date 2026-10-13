@@ -6,7 +6,8 @@ const PostDeta = async (req, res) => {
   if (
     !data.titalPrime ||
     !data.titalTech ||
-    !data.titalBase 
+    !data.titalBase ||
+    !data.contactCards
     
   ) {
     return res
@@ -20,6 +21,8 @@ const PostDeta = async (req, res) => {
       titalTech: data.titalTech,
       titalBase: data.titalBase,
       
+      contactCards:data.contactCards,
+      
     });
 
     return res.status(201).json({
@@ -32,5 +35,19 @@ const PostDeta = async (req, res) => {
   }
 };
 
-module.exports={PostDeta}
+const GetDeta = async (req, res) => {
+  try {
+    const Deta = await contactDeta.find()
+
+    return res.status(200).json({
+      success: true,
+      message: "Deta Sends Sucessfull",
+      Contact: Deta,
+    })
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message })
+  }
+}
+
+module.exports={PostDeta, GetDeta}
 
