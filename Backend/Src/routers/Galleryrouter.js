@@ -1,8 +1,9 @@
 const express=require("express")
-
-const router=express.Router()
 const {PostDeta}=require("../Controllers/Gallerycontrollers")
 
-router.get("/postDeta",PostDeta)
+const router=express.Router()
+
+
+router.post("/postDeta",PostDeta)
 
 module.exports=router;

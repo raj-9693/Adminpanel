@@ -2,21 +2,13 @@
 const mongoose=require("mongoose")
 
 const HomeSchema=new mongoose.Schema({
-    titalPrime:{type:String, default:null},
-
-    titalTech:{type:String, require:true},
-
-    titalBase:{type:String,require:true},
-
-    BannerImage:{type:String,require:null},
-
-    Bridesitem:{type:Number, require:true},
-
-    years:{type:Number , require:true},
-
-    review:{type:String, require:true},
-
-
+    titalPrime:{type:String, required:true},
+    titalTech:{type:String, required:true},
+    titalBase:{type:String, required:true},
+    BannerImage:{type:String, default:null},
+    Bridesitem:{type:Number, required:true},
+    years:{type:Number, required:true},
+    review:{type:String, required:true},
 })
 
 const Home=mongoose.model("Home",HomeSchema)

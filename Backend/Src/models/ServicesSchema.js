@@ -2,9 +2,9 @@ const mongoose=require("mongoose")
 
 const Services=new mongoose.Schema({
 
-    titalPrime:{type:String,default:null},
-    titalTech:{type:String,require:true},
-    titalBase:{type:String, require:true},
+    titalPrime:{type:String, required:true},
+    titalTech:{type:String, required:true},
+    titalBase:{type:String, required:true},
 })
 
 const ServicesDeta=mongoose.model("Services",Services)
