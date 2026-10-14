@@ -48,7 +48,7 @@ export default function BottomForm({ data, onChange }) {
         <Field label="“Visit us” heading" max={24} value={f.visitTitle} onChange={(v) => setF({ visitTitle: v })} />
         <Field label="Phone" max={24} value={f.phone} onChange={(v) => setF({ phone: v })} />
       </div>
-      <Field label="Address" as="textarea" rows={2} max={120} value={f.address} onChange={(v) => setF({ address: v })} />
+      <Field label="Address" as="textarea" rows={2} max={120} hint="Press Enter for a second line" value={f.address} onChange={(v) => setF({ address: v })} />
       <Field label="Email" type="email" max={60} value={f.email} onChange={(v) => setF({ email: v })} />
 
       <h4 className="sx-sub">Footer · social & legal</h4>
@@ -60,6 +60,7 @@ export default function BottomForm({ data, onChange }) {
         <Field label="Instagram link" placeholder="https://instagram.com/…" value={f.instagram} onChange={(v) => setF({ instagram: v })} />
         <Field label="Facebook link" placeholder="https://facebook.com/…" value={f.facebook} onChange={(v) => setF({ facebook: v })} />
       </div>
+      <Field label="YouTube link" placeholder="https://youtube.com/…" value={f.youtube} onChange={(v) => setF({ youtube: v })} />
       <div className="fd-row">
         <Field label="Copyright line" max={80} value={f.copyright} onChange={(v) => setF({ copyright: v })} />
         <Field label="Closing line" max={60} value={f.madeWith} onChange={(v) => setF({ madeWith: v })} />

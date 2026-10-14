@@ -13,6 +13,12 @@ const Fb = (p) => (
   </svg>
 );
 
+const Yt = (p) => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <rect x="3" y="6" width="18" height="12" rx="4" /><path d="m10.5 9.5 4 2.5-4 2.5z" />
+  </svg>
+);
+
 /** Photo ya (photo na ho to) halka placeholder tile */
 export function Pic({ src, alt = "", i = 0, className = "" }) {
   return src ? (
@@ -31,7 +37,7 @@ export function SiteNav({ active, brand = "Saanjh" }) {
       <span className="sp-links">
         {SITE_NAV.map((l) => <em key={l} className={l === active ? "on" : ""}>{l}</em>)}
       </span>
-      <span className="sp-btn sm">Book now</span>
+      <span className="sp-navr"><span className="sp-lang"><b>हिंदी</b> / EN</span><span className="sp-btn sm">Book now</span></span>
     </nav>
   );
 }
@@ -62,7 +68,7 @@ export function BottomPreview({ d }) {
         <div>
           <h5>{f.visitTitle}</h5>
           <ul className="icons">
-            <li><MapPin size={14} /> {f.address}</li>
+            <li><MapPin size={14} /> <span style={{ whiteSpace: "pre-line" }}>{f.address}</span></li>
             <li><Mail size={14} /> {f.email}</li>
             <li><Phone size={14} /> {f.phone}</li>
           </ul>
@@ -70,7 +76,7 @@ export function BottomPreview({ d }) {
         <div>
           <h5>{f.followTitle}</h5>
           <p className="sp-fblurb">{f.followText}</p>
-          <div className="sp-social"><span><Insta /></span><span><Fb /></span><span><Mail size={15} /></span></div>
+          <div className="sp-social"><span><Insta /></span><span><Fb /></span><span><Yt /></span></div>
         </div>
       </footer>
       <div className="sp-legal"><span>{f.copyright}</span><span>{f.madeWith}</span></div>

@@ -140,14 +140,75 @@ export const bottomDefaults = {
       { id: 'f4', label: 'Book consultation' },
     ],
     visitTitle: 'Visit us',
-    address: '12, Rose Court, Greater Kailash, New Delhi',
+    address: 'Mehrauli, New Delhi\nBy appointment only',
     email: 'hello@saanjhbeauty.in',
     phone: '+91 98765 43210',
     followTitle: 'Stay close',
     followText: 'Follow our latest bridal stories and beauty notes.',
     instagram: 'https://instagram.com/',
     facebook: 'https://facebook.com/',
+    youtube: 'https://youtube.com/',
     copyright: '© 2026 Saanjh Bridal Beauty. All rights reserved.',
     madeWith: 'Made with care for Saanjh brides.',
+  },
+};
+
+/* ----------------------------- ABOUT ----------------------------- */
+export const aboutDefaults = {
+  hero: {
+    eyebrow: 'The hands behind the glow',
+    title: 'Beauty that begins with listening.',
+    text: 'Meet the artist behind Saanjh—a quiet presence for your wedding morning and a considered hand behind every luminous detail.',
+  },
+  story: {
+    eyebrow: 'A note from Riya',
+    title: 'A softer way to get ready.',
+    image: img('about-riya', 800, 1000),
+    imageName: '',
+    quote: '“A bride should look like herself, remembered beautifully.”',
+    p1: 'I began Saanjh with a simple belief: beauty on a wedding day should never feel like a costume. It should feel like recognition—your features, your rituals, your joy, brought gently into focus.',
+    p2: 'For over twelve years, I have worked with brides across intimate home ceremonies and grand destination celebrations. Every look starts with a conversation, and every brushstroke has a reason.',
+    stats: [
+      { id: 'a1', value: '12 years', label: 'Bridal artistry' },
+      { id: 'a2', value: '650+ brides', label: 'Loved looks' },
+    ],
+    button: 'Plan your Saanjh',
+  },
+  numbers: {
+    items: [
+      { id: 'n1', value: '4.9/5', label: 'Bride rating' },
+      { id: 'n2', value: '18', label: 'Cities travelled' },
+      { id: 'n3', value: '200+', label: 'Love notes' },
+      { id: 'n4', value: '1:1', label: 'Personal attention' },
+    ],
+  },
+  process: {
+    eyebrow: 'From first hello to final touch',
+    title: 'Our process, held with care.',
+    items: [
+      { id: 'st1', title: 'Consultation', text: 'We speak about your ceremonies, wardrobe, skin, references, and the feeling you want to carry.' },
+      { id: 'st2', title: 'Your trial', text: 'A relaxed studio session to refine tones, texture, hair, and every personal finishing touch.' },
+      { id: 'st3', title: 'Wedding day', text: 'A calm, beautifully paced morning where your look comes together without rush.' },
+      { id: 'st4', title: 'Touch-ups', text: 'A final check before you step out, plus thoughtful guidance for effortless wear through celebration.' },
+    ],
+  },
+  travel: {
+    eyebrow: 'Where Saanjh travels',
+    title: 'Near your people, wherever they gather.',
+    text: 'Our studio is in New Delhi, with destination bridal bookings across India and beyond. Travel planning is always handled with clarity and care.',
+    cities: [
+      { id: 'ct1', label: 'Delhi NCR' }, { id: 'ct2', label: 'Jaipur' }, { id: 'ct3', label: 'Udaipur' },
+      { id: 'ct4', label: 'Mumbai' }, { id: 'ct5', label: 'Goa' }, { id: 'ct6', label: 'Worldwide' },
+    ],
+  },
+  kit: {
+    eyebrow: 'Our kit, considered',
+    title: 'Trusted by artists. Chosen for your skin.',
+    text: 'We edit every kit around performance, comfort, and photography—not trends alone.',
+    brands: [
+      { id: 'br1', label: 'MAC Cosmetics' }, { id: 'br2', label: 'NARS' }, { id: 'br3', label: 'Charlotte Tilbury' },
+      { id: 'br4', label: 'Dior Beauty' }, { id: 'br5', label: 'Huda Beauty' }, { id: 'br6', label: 'Bobbi Brown' },
+    ],
+    note: 'Every product is selected after your consultation, with sensitivity and undertone in mind.',
   },
 };
