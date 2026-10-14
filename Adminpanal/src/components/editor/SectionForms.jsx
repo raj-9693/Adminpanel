@@ -1,5 +1,20 @@
-import { TextField, TextArea, ImageUpload } from './Field';
+import Field from './Field';
 import { CloseIcon, UploadIcon } from './EditorIcons';
+
+// Field ke aliases taaki baaki code change na ho
+const TextField = (props) => <Field {...props} />;
+const TextArea  = (props) => <Field as="textarea" {...props} />;
+const ImageUpload = ({ label, fileName, onFiles }) => (
+  <div className="ed-field">
+    <span className="ed-label">{label}</span>
+    <label className="ed-dropzone">
+      <UploadIcon />
+      <span>{fileName || 'Upload image'}</span>
+      <small>PNG or JPG</small>
+      <input type="file" accept="image/*" hidden onChange={(e) => onFiles(e.target.files)} />
+    </label>
+  </div>
+);
 
 /* helper: list ke ek item ko update karna */
 const patchItem = (data, i, patch) => ({

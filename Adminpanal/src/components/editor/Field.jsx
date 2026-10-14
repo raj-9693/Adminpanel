@@ -1,40 +1,42 @@
-import { ImageIcon } from './EditorIcons';
+import { useId } from "react";
 
-export function TextField({ label, value, onChange, placeholder }) {
-  return (
-    <label className="ed-field">
-      <span className="ed-label">{label}</span>
-      <input
-        className="ed-input" value={value} placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-      />
-    </label>
-  );
-}
+// Ek hi component: input / number / textarea / select. onChange(value) string deta hai.
+export default function Field({
+  label, value, onChange, as = "input", type = "text", rows = 3, caps = false, max, hint, error,
+  placeholder, options = [], disabled = false, min, step, className = "",
+}) {
+  const id = useId();
+  const common = {
+    id,
+    value: value ?? "",
+    disabled,
+    placeholder,
+    "aria-invalid": error ? true : undefined,
+    className: `fd-ctl ${caps ? "caps" : ""} ${error ? "bad" : ""}`,
+    onChange: (e) => onChange(e.target.value),
+  };
 
-export function TextArea({ label, value, onChange, placeholder, rows = 3 }) {
-  return (
-    <label className="ed-field">
-      <span className="ed-label">{label}</span>
-      <textarea
-        className="ed-input ed-textarea" rows={rows} value={value} placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-      />
-    </label>
-  );
-}
+  let ctl;
+  if (as === "textarea") ctl = <textarea {...common} rows={rows} maxLength={max} />;
+  else if (as === "select")
+    ctl = (
+      <select {...common}>
+        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    );
+  else ctl = <input {...common} type={type} min={min} step={step} maxLength={type === "text" ? max : undefined} />;
 
-/* Single image (Hero) – file name dikhata hai, "Replace" par click se naya image */
-export function ImageUpload({ label, fileName, onFiles }) {
   return (
-    <div className="ed-field">
-      <span className="ed-label">{label}</span>
-      <label className="ed-upload">
-        <span className="ed-upload__icon"><ImageIcon /></span>
-        <span className="ed-upload__name">{fileName}</span>
-        <span className="ed-upload__action">Replace</span>
-        <input type="file" accept="image/*" hidden onChange={(e) => onFiles(e.target.files)} />
-      </label>
+    <div className={`fd ${className}`}>
+      {label && <label htmlFor={id}>{label}</label>}
+      {ctl}
+      {(hint || (max && as !== "select")) && (
+        <div className="fd-foot">
+          <span>{hint}</span>
+          {max && as !== "select" && <span>{String(value ?? "").length}/{max}</span>}
+        </div>
+      )}
+      {error && <em className="fd-err">{error}</em>}
     </div>
   );
 }

@@ -10,11 +10,18 @@ export const loginDefaults = {
 };
 
 export const navItems = [
-  { id: 'overview', label: 'Overview', icon: 'grid', path: '/dashboard' },
-  { id: 'bookings', label: 'Bookings', icon: 'calendar', path: '/bookings' },
-  { id: 'enquiries', label: 'Enquiries', icon: 'inbox', path: '/enquiries' },
-  { id: 'clients', label: 'Clients', icon: 'users', path: null },
-  { id: 'reports', label: 'Reports', icon: 'chart', path: null },
+  { id: 'overview',  label: 'Overview',  icon: 'grid',     path: '/dashboard', group: null },
+  { id: 'bookings',  label: 'Bookings',  icon: 'calendar', path: '/bookings',   group: null, badge: '08' },
+
+  // Website section - sabse neeche
+  { id: 'website',   label: 'Website',   icon: 'page',     path: null,          group: 'website', isGroup: true },
+  { id: 'home',      label: 'Home',      icon: null,       path: '/website/home',     group: 'website' },
+  { id: 'gallery',   label: 'Gallery',   icon: null,       path: '/website/gallery',  group: 'website' },
+  { id: 'services',  label: 'Services',  icon: null,       path: '/website/services', group: 'website' },
+  { id: 'reviews',   label: 'Reviews',   icon: null,       path: '/website/reviews',  group: 'website' },
+  { id: 'about',     label: 'About',     icon: null,       path: '/website/about',    group: 'website' },
+  { id: 'booking',   label: 'Booking',   icon: null,       path: '/website/booking',  group: 'website' },
+  { id: 'contact',   label: 'Contact',   icon: null,       path: '/website/contact',  group: 'website' },
 ];
 
 export const dateLabel = 'Tuesday, 15 October';

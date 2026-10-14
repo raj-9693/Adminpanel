@@ -4,8 +4,8 @@ const {PostDeta, GetDeta}=require("../Controllers/Servicescontrollers")
 
 const router=express.Router()
 
-router.post("/PostDeta",PostDeta)
-router.get("/GetDeta",GetDeta)
+router.post("/postDeta",PostDeta)
+router.get("/getDeta",GetDeta)
 
 module.exports=router;
 

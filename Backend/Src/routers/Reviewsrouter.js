@@ -3,7 +3,7 @@ const express=require("express")
 const {PostDeta, GetDeta}=require("../Controllers/Reviewscontrollers")
 
  const router=express.Router()
- router.post("/PostDeta",PostDeta)
- router.get("/GetDeta",GetDeta)
+ router.post("/postDeta",PostDeta)
+ router.get("/getDeta",GetDeta)
 
  module.exports=router
