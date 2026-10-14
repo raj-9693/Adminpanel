@@ -1,12 +1,85 @@
-const mongoose=require("mongoose")
+const mongoose = require("mongoose");
 
-const About = mongoose.Schema({
-    
-    titalPrime:{type:String, required:true},
-    titalTech:{type:String, required:true},
-    titalBase:{type:String, required:true},
-})
+const AboutSchema = new mongoose.Schema(
+  {
+    hero: {
+      eyebrow: { type: String, default: "" },
+      title: { type: String, required: true },
+      text: { type: String, default: "" },
+    },
 
-const Deta = mongoose.model("About",About)
+    story: {
+      eyebrow: { type: String, default: "" },
+      title: { type: String, default: "" },
+      image: { type: String, default: "" },
+      imageName: { type: String, default: "" },
+      quote: { type: String, default: "" },
+      p1: { type: String, default: "" },
+      p2: { type: String, default: "" },
+      stats: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          value: { type: String, required: true, trim: true },
+          label: { type: String, required: true, trim: true },
+        },
+      ],
+      button: { type: String, default: "" },
+    },
 
-module.exports=Deta;
+    numbers: {
+      items: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          value: { type: String, required: true, trim: true },
+          label: { type: String, required: true, trim: true },
+        },
+      ],
+    },
+
+    process: {
+      eyebrow: { type: String, default: "" },
+      title: { type: String, default: "" },
+      items: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          title: { type: String, required: true, trim: true },
+          text: { type: String, default: "" },
+        },
+      ],
+    },
+
+    travel: {
+      eyebrow: { type: String, default: "" },
+      title: { type: String, default: "" },
+      text: { type: String, default: "" },
+      cities: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          label: { type: String, required: true, trim: true },
+        },
+      ],
+    },
+
+    kit: {
+      eyebrow: { type: String, default: "" },
+      title: { type: String, default: "" },
+      text: { type: String, default: "" },
+      brands: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          label: { type: String, required: true, trim: true },
+        },
+      ],
+      note: { type: String, default: "" },
+    },
+  },
+  { timestamps: true }
+);
+
+const About = mongoose.model("About", AboutSchema);
+module.exports = About;

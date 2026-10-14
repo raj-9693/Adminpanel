@@ -5,5 +5,6 @@ const {PostDeta,GetDeta}=require("../Controllers/Aboutcontrollers")
 const router=express.Router();
 router.post("/postDeta",PostDeta)
 router.get("/getdeta",GetDeta)
+router.put("/putDeta",UpdateDeta)
 
 module.exports=router
