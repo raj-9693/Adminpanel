@@ -1,4 +1,4 @@
-import { Sparkles, UserRound, Hash, ListOrdered, MapPin, Briefcase, Send } from "lucide-react";
+import { Sparkles, UserRound, Hash, ListOrdered, MapPin, Briefcase } from "lucide-react";
 import Layout from "../components/Layout";
 import SectionCard from "../components/editor/SectionCard.jsx";
 import SectionNav from "../components/editor/SectionNav.jsx";
@@ -6,7 +6,7 @@ import EditorToolbar from "../components/editor/EditorToolbar.jsx";
 import Field from "../components/editor/Field.jsx";
 import ItemList from "../components/editor/ItemList.jsx";
 import PhotoField from "../components/editor/PhotoField.jsx";
-import BottomForm from "../components/editor/BottomForm.jsx";
+import SharedBottomNote from "../components/editor/SharedBottomNote.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
 import AboutPreview from "../components/editor/preview/AboutPreview.jsx";
 import useSiteEditor from "../editor/useSiteEditor.js";
@@ -18,7 +18,7 @@ import "../styles/siteEditor.css";
 
 const SITE = import.meta.env.VITE_SITE_URL || "http://localhost:5173";
 
-const ORDER = ["hero", "story", "numbers", "process", "travel", "kit", "bottom"];
+const ORDER = ["hero", "story", "numbers", "process", "travel", "kit"];
 const META = {
   hero:    { icon: Sparkles,   nav: "Intro",   title: "Page intro",        sub: "Heading & welcome text" },
   story:   { icon: UserRound,  nav: "Story",   title: "Artist’s note",     sub: "Portrait, personal story & key numbers" },
@@ -26,7 +26,6 @@ const META = {
   process: { icon: ListOrdered,nav: "Process", title: "Our process",       sub: "Steps from first hello to final touch" },
   travel:  { icon: MapPin,     nav: "Travel",  title: "Where we travel",   sub: "Text & list of cities" },
   kit:     { icon: Briefcase,  nav: "Kit",     title: "Our kit",           sub: "Brands we use & skin-care note" },
-  bottom:  { icon: Send,       nav: "Bottom",  title: "Bottom section",    sub: "Call-to-action & footer · shared on all pages" },
 };
 const NAV = ORDER.map((id) => ({ id, label: META[id].nav, icon: META[id].icon }));
 
@@ -43,7 +42,8 @@ export default function AboutEditor() {
       </div></div></Layout>
     );
 
-  const { page: p, bottom } = ed.draft;
+  const p = ed.draft;
+  const bottom = ed.bottom;
   const upd = (key, patch) => ed.setPage((d) => ({ ...d, [key]: { ...d[key], ...patch } }));
   const edit = (sec, itemKey, node) => (
     <div onFocusCapture={() => ed.focusSection(sec, itemKey ? [itemKey] : [])}>{node}</div>
@@ -156,8 +156,6 @@ export default function AboutEditor() {
         <Field label="Note at the bottom" as="textarea" rows={2} max={140} value={p.kit.note} onChange={(v) => upd("kit", { note: v })} />
       </>
     ),
-
-    bottom: <BottomForm data={bottom} onChange={ed.setBottom} />,
   };
 
   return (
@@ -187,6 +185,7 @@ export default function AboutEditor() {
                 </div>
               );
             })}
+            <SharedBottomNote />
           </div>
 
           <LivePreview url="saanjhbeauty.in/about" active={ed.active}>

@@ -1,18 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { getSiteContent, saveSiteContent } from '../api/siteContent.js';
+import { getSiteContent, saveSiteContent, DEFAULTS } from '../api/siteContent.js';
 
 // Left card kholne par us card ko left pane me upar le aao (accordion animation ke baad).
 const scrollToCard = (id) =>
   setTimeout(() => document.getElementById(`sec-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 480);
 
 /**
- * Home / Gallery dono editors ka common logic.
- *  - draft  = { page, bottom }  (bottom = shared CTA + footer, alag key me save hota hai)
+ * Home / Gallery / About / Bottom sab editors ka common logic.
+ *  - draft  = us page ka apna data (sirf wahi save hota hai)
+ *  - bottom = shared CTA + footer, sirf PREVIEW ke liye (read-only). Isse "Bottom" page par edit karte hain.
+ *             pageKey === 'bottom' ho to bottom = draft (live preview me wahi dikhta hai).
  *  - active = preview ko batata hai kaun sa section dikhana/highlight karna hai
  */
-export default function useSiteEditor({ pageKey, order, validate }) {
+export default function useSiteEditor({ pageKey, order, validate, prepare }) {
+  const standalone = pageKey === 'bottom';
   const [draft, setDraft] = useState(null);
   const [saved, setSaved] = useState(null);
+  const [shared, setShared] = useState(null);
   const [loadState, setLoadState] = useState('loading'); // loading | ready | error
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
@@ -23,15 +27,18 @@ export default function useSiteEditor({ pageKey, order, validate }) {
 
   const load = useCallback(() => {
     setLoadState('loading');
-    Promise.all([getSiteContent(pageKey), getSiteContent('bottom')])
+    Promise.all([
+      getSiteContent(pageKey),
+      standalone ? Promise.resolve(null) : getSiteContent('bottom').catch(() => null),
+    ])
       .then(([p, b]) => {
-        const d = { page: p.page, bottom: b.page };
-        setDraft(d); setSaved(d);
-        setLastSaved(Math.max(p.savedAt || 0, b.savedAt || 0) || null);
+        setDraft(p.page); setSaved(p.page);
+        setShared(b ? b.page : DEFAULTS.bottom);
+        setLastSaved(p.savedAt || null);
         setLoadState('ready');
       })
       .catch((err) => { console.error('Editor load error:', err); setLoadState('error'); });
-  }, [pageKey]);
+  }, [pageKey, standalone]);
   useEffect(() => { load(); }, [load]);
 
   const dirty = useMemo(
@@ -40,9 +47,8 @@ export default function useSiteEditor({ pageKey, order, validate }) {
   );
   const errs = useMemo(() => (showErrors && draft ? validate(draft) : {}), [showErrors, draft, validate]);
 
-  /* ---------- draft setters ---------- */
-  const setPage = useCallback((fn) => setDraft((d) => ({ ...d, page: typeof fn === 'function' ? fn(d.page) : fn })), []);
-  const setBottom = useCallback((fn) => setDraft((d) => ({ ...d, bottom: typeof fn === 'function' ? fn(d.bottom) : fn })), []);
+  /* ---------- draft setter ---------- */
+  const setPage = useCallback((fn) => setDraft((d) => (typeof fn === 'function' ? fn(d) : fn)), []);
 
   /* ---------- section open / preview focus ---------- */
   const focusSection = useCallback((id, extra = []) => {
@@ -69,8 +75,9 @@ export default function useSiteEditor({ pageKey, order, validate }) {
     }
     setSaving(true);
     try {
-      const snap = draft;
-      await Promise.all([saveSiteContent(pageKey, snap.page), saveSiteContent('bottom', snap.bottom)]);
+      const snap = prepare ? prepare(draft) : draft; // prepare = save se pehle data saaf karna (numbers wagairah)
+      await saveSiteContent(pageKey, snap);
+      if (prepare) setDraft(snap);
       setSaved(snap); setLastSaved(Date.now()); setShowErrors(false);
       setToast('Changes saved.');
     } catch (err) {
@@ -106,8 +113,9 @@ export default function useSiteEditor({ pageKey, order, validate }) {
   }, [toast]);
 
   return {
-    draft, loadState, load, dirty, errs, saving, lastSaved, toast,
+    draft, bottom: standalone ? draft : shared,
+    loadState, load, dirty, errs, saving, lastSaved, toast,
     open, active, toggle, jump, focusSection,
-    setPage, setBottom, save, reset,
+    setPage, save, reset,
   };
 }

@@ -1,32 +1,68 @@
-const mongoose=require("mongoose")
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const Services=new mongoose.Schema({
+const ServicesSchema = new Schema(
+  {
+    hero: {
+      eyebrow: { type: String, default: "" },
+      title: { type: String, required: true },
+      text: { type: String, default: "" },
+    },
 
-    titalPrime:{type:String, required:true},
-    titalTech:{type:String, required:true},
-    titalBase:{type:String, required:true},
+    packages: {
+      note: { type: String, default: "" },
+      badge: { type: String, default: "" },
+      items: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          image: { type: String, default: "" },
+          imageName: { type: String, default: "" },
+          eyebrow: { type: String, default: "" },
+          title: { type: String, required: true, trim: true },
+          price: { type: String, default: "" }, // "₹18,000" text hai, isliye String
+          priceNote: { type: String, default: "" },
+          features: { type: String, default: "" }, // har feature nayi line (\n) mein
+          button: { type: String, default: "Book This" },
+          popular: { type: Boolean, default: false },
+        },
+      ],
+    },
 
-    // services cards (3 cards ka array)
-    cards: [
-      {
-        eyebrow: { type: String, required: true },
-        tital: { type: String, required: true },
-        price: { type: Number, required: true },
-        image: { type: String },
-        features: { type: [String], required: true },
-        popular: { type: Boolean, default: false },
-      },
-    ],
-    //table card (4)
- tableRows: [
-      {
-        label: { type: String, required: true },
-        values: { type: [Boolean], required: true },
-        order: { type: Number, default: 0 },
-      },
-    ],
-})
+    compare: {
+      eyebrow: { type: String, default: "" },
+      title: { type: String, default: "" },
+      note: { type: String, default: "" },
+      tableLabel: { type: String, default: "" },
+      priceRowLabel: { type: String, default: "" },
+      rows: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          label: { type: String, required: true, trim: true },
+          // { p1: true, p3: true } jaisa object. Keys package ki id hoti hain, isliye Map use kiya
+          inc: { type: Map, of: Boolean, default: {} },
+        },
+      ],
+    },
 
-const ServicesDeta=mongoose.model("Services",Services)
+    faq: {
+      eyebrow: { type: String, default: "" },
+      title: { type: String, default: "" },
+      text: { type: String, default: "" },
+      button: { type: String, default: "" },
+      items: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          q: { type: String, required: true },
+          a: { type: String, required: true },
+        },
+      ],
+    },
+  },
+  { timestamps: true }
+);
 
-module.exports=ServicesDeta;
+const Services = mongoose.model("Services", ServicesSchema);
+module.exports = Services;

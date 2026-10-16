@@ -9,6 +9,7 @@ import ServicesEditor from './pages/ServicesEditor';
 import AboutEditor from './pages/AboutEditor';
 import BookingEditor from './pages/BookingEditor';
 import ContactEditor from './pages/ContactEditor';
+import BottomSectionEditor from './pages/BottomSectionEditor';
 import './styles/theme.css';
 
 // ReviewsEditor alag lazy load — taaki isme error ho to baaki app nahi toote
@@ -42,6 +43,7 @@ export default function App() {
       <Route path="/website/about"    element={<AboutEditor />} />
       <Route path="/website/booking"  element={<BookingEditor />} />
       <Route path="/website/contact"  element={<ContactEditor />} />
+      <Route path="/website/bottom"   element={<BottomSectionEditor />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -22,6 +22,7 @@ export const navItems = [
   { id: 'about',     label: 'About',     icon: null,       path: '/website/about',    group: 'website' },
   { id: 'booking',   label: 'Booking',   icon: null,       path: '/website/booking',  group: 'website' },
   { id: 'contact',   label: 'Contact',   icon: null,       path: '/website/contact',  group: 'website' },
+  { id: 'bottom',    label: 'Bottom',    icon: null,       path: '/website/bottom',   group: 'website' },
 ];
 
 export const dateLabel = 'Tuesday, 15 October';

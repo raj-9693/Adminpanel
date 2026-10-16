@@ -42,30 +42,33 @@ export function SiteNav({ active, brand = "Saanjh" }) {
   );
 }
 
-/** SHARED bottom: CTA card + footer. Home aur Gallery dono yahi use karte hain. */
-export function BottomPreview({ d }) {
+/** SHARED bottom: CTA card + footer. Home / Gallery / About / Bottom page sab yahi use karte hain.
+ *  data-sec = "Website → Bottom" editor me jis hisse ko edit karo, preview wahin jaata hai. */
+export function BottomPreview({ d, cta: showCta = true }) {
   const { cta, footer: f } = d;
   return (
-    <div data-sec="bottom">
-      <section className="sp-sec sp-ctawrap">
-        <div className="sp-cta">
-          <p className="sp-eb dark">{cta.eyebrow}</p>
-          <h2>{cta.title}</h2>
-          <p className="sp-ctatext">{cta.text}</p>
-          <span className="sp-btn">{cta.button} <ArrowRight size={15} /></span>
-        </div>
-      </section>
+    <div>
+      {showCta && (
+        <section className="sp-sec sp-ctawrap">
+          <div className="sp-cta" data-sec="cta">
+            <p className="sp-eb dark">{cta.eyebrow}</p>
+            <h2>{cta.title}</h2>
+            <p className="sp-ctatext">{cta.text}</p>
+            <span className="sp-btn">{cta.button} <ArrowRight size={15} /></span>
+          </div>
+        </section>
+      )}
 
-      <footer className="sp-foot">
-        <div>
+      <footer className="sp-foot" data-sec="footer">
+        <div data-sec="f-brand">
           <span className="sp-logo"><i>स</i>{f.brand}</span>
           <p className="sp-fblurb">{f.blurb}</p>
         </div>
-        <div>
+        <div data-sec="f-links">
           <h5>{f.linksTitle}</h5>
           <ul>{f.links.map((l) => <li key={l.id}>{l.label}</li>)}</ul>
         </div>
-        <div>
+        <div data-sec="f-contact">
           <h5>{f.visitTitle}</h5>
           <ul className="icons">
             <li><MapPin size={14} /> <span style={{ whiteSpace: "pre-line" }}>{f.address}</span></li>
@@ -73,13 +76,13 @@ export function BottomPreview({ d }) {
             <li><Phone size={14} /> {f.phone}</li>
           </ul>
         </div>
-        <div>
+        <div data-sec="f-social">
           <h5>{f.followTitle}</h5>
           <p className="sp-fblurb">{f.followText}</p>
           <div className="sp-social"><span><Insta /></span><span><Fb /></span><span><Yt /></span></div>
         </div>
       </footer>
-      <div className="sp-legal"><span>{f.copyright}</span><span>{f.madeWith}</span></div>
+      <div className="sp-legal" data-sec="f-legal"><span>{f.copyright}</span><span>{f.madeWith}</span></div>
     </div>
   );
 }

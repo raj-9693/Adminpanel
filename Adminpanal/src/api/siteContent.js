@@ -1,16 +1,16 @@
-import { homeDefaults, galleryDefaults, aboutDefaults, bottomDefaults } from '../data/editorData.js';
+import { homeDefaults, galleryDefaults, aboutDefaults, servicesDefaults, reviewsDefaults, contactDefaults, bookingDefaults, bottomDefaults } from '../data/editorData.js';
 
 // .env me:  VITE_API_URL=https://your-server.com/api
 // Backend endpoints (ReviewsEditor jaise hi):
 //   GET /admin/pages/:key  -> { page, savedAt }   (404 = abhi kuch save nahi, defaults dikhao)
 //   PUT /admin/pages/:key  -> { page, savedAt }
-// key = "home" | "gallery" | "about" | "bottom"
+// key = "home" | "gallery" | "about" | "services" | "reviews" | "contact" | "booking" | "bottom"
 // Website (frontend) bhi wahi data GET /pages/:key se padhe — tab Save dabate hi user-side update ho jaata hai.
 //
 // VITE_API_URL na ho to data sirf is browser ke localStorage me save hota hai (demo / development).
 const API = import.meta.env.VITE_API_URL;
 
-export const DEFAULTS = { home: homeDefaults, gallery: galleryDefaults, about: aboutDefaults, bottom: bottomDefaults };
+export const DEFAULTS = { home: homeDefaults, gallery: galleryDefaults, about: aboutDefaults, services: servicesDefaults, reviews: reviewsDefaults, contact: contactDefaults, booking: bookingDefaults, bottom: bottomDefaults };
 
 const lsKey = (k) => `saanjh_site_${k}`;
 const clone = (x) => JSON.parse(JSON.stringify(x));

@@ -3,8 +3,9 @@ import { GripVertical, Pencil, Trash2, Plus } from "lucide-react";
 import useDragReorder from "../../editor/useDragReorder.js";
 
 // Compact rows + inline edit. summary(item) -> { thumb, title, subtitle }
+// reorder={false} -> drag & drop band (jab order fixed ho, jaise booking ke steps)
 export default function ItemList({
-  items, onChange, summary, toggles, editor, makeNew, addLabel = "Add item", canAdd = true, canDelete = true,
+  items, onChange, summary, toggles, editor, makeNew, addLabel = "Add item", canAdd = true, canDelete = true, reorder = true,
 }) {
   const [open, setOpen] = useState(null);
   const [confirm, setConfirm] = useState(null);
@@ -22,8 +23,8 @@ export default function ItemList({
           const isOpen = open === it.id;
           return (
             <li key={it.id} className={`il-item ${isOpen ? "open" : ""} ${over === i ? "over" : ""}`}>
-              <div className="il-row" draggable {...bind(i)}>
-                <span className="il-grip" aria-hidden><GripVertical size={18} /></span>
+              <div className="il-row" draggable={reorder} {...(reorder ? bind(i) : {})}>
+                {reorder && <span className="il-grip" aria-hidden><GripVertical size={18} /></span>}
                 <span className="il-thumb">{s.thumb}</span>
                 <button type="button" className="il-main" onClick={() => setOpen(isOpen ? null : it.id)} aria-expanded={isOpen}>
                   <b>{s.title}</b>

@@ -1,4 +1,4 @@
-import { Sparkles, Award, Layers, Image as ImageIcon, Quote, Heart, Send } from "lucide-react";
+import { Sparkles, Award, Layers, Image as ImageIcon, Quote, Heart } from "lucide-react";
 import Layout from "../components/Layout";
 import SectionCard from "../components/editor/SectionCard.jsx";
 import SectionNav from "../components/editor/SectionNav.jsx";
@@ -6,7 +6,7 @@ import EditorToolbar from "../components/editor/EditorToolbar.jsx";
 import Field from "../components/editor/Field.jsx";
 import ItemList from "../components/editor/ItemList.jsx";
 import PhotoField from "../components/editor/PhotoField.jsx";
-import BottomForm from "../components/editor/BottomForm.jsx";
+import SharedBottomNote from "../components/editor/SharedBottomNote.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
 import HomePreview from "../components/editor/preview/HomePreview.jsx";
 import { ICONS, ICON_OPTIONS } from "../components/editor/icons.js";
@@ -20,7 +20,7 @@ import "../styles/siteEditor.css";
 const SITE = import.meta.env.VITE_SITE_URL || "http://localhost:5173";
 
 // Order = website par jis order me sections dikhte hain (screenshot jaisa)
-const ORDER = ["hero", "stats", "basics", "glimpse", "reviews", "promises", "bottom"];
+const ORDER = ["hero", "stats", "basics", "glimpse", "reviews", "promises"];
 const META = {
   hero:     { icon: Sparkles,  nav: "Hero",     title: "Hero banner",          sub: "Headline, buttons & main photo" },
   stats:    { icon: Award,     nav: "Stats",    title: "Key statistics",       sub: "Brides, years of experience & rating" },
@@ -28,7 +28,6 @@ const META = {
   glimpse:  { icon: ImageIcon, nav: "Glimpse",  title: "Real radiance",        sub: "Featured bride photos & captions" },
   reviews:  { icon: Quote,     nav: "Notes",    title: "Love notes",           sub: "Bride testimonials on the home page" },
   promises: { icon: Heart,     nav: "Promises", title: "Promise strip",        sub: "Four short reasons to choose Saanjh" },
-  bottom:   { icon: Send,      nav: "Bottom",   title: "Bottom section",       sub: "Call-to-action & footer · shared on all pages" },
 };
 const NAV = ORDER.map((id) => ({ id, label: META[id].nav, icon: META[id].icon }));
 
@@ -45,7 +44,8 @@ export default function HomePageEditor() {
       </div></div></Layout>
     );
 
-  const { page: p, bottom } = ed.draft;
+  const p = ed.draft;
+  const bottom = ed.bottom;
   const upd = (key, patch) => ed.setPage((d) => ({ ...d, [key]: { ...d[key], ...patch } }));
   const setItems = (key, items) => upd(key, { items });
   // item editor ke andar focus aaye to preview us item tak jaye (nahi mila to section tak)
@@ -201,8 +201,6 @@ export default function HomePageEditor() {
         ))}
       />
     ),
-
-    bottom: <BottomForm data={bottom} onChange={ed.setBottom} />,
   };
 
   return (
@@ -238,6 +236,7 @@ export default function HomePageEditor() {
                 </div>
               );
             })}
+            <SharedBottomNote />
           </div>
 
           {/* RIGHT: live preview (fixed, andar apna scroll) */}

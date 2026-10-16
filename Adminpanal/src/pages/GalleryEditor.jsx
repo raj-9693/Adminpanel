@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Tag, Image as ImageIcon, Star, Send, Upload } from "lucide-react";
+import { Sparkles, Tag, Image as ImageIcon, Star, Upload } from "lucide-react";
 import Layout from "../components/Layout";
 import SectionCard from "../components/editor/SectionCard.jsx";
 import SectionNav from "../components/editor/SectionNav.jsx";
@@ -8,7 +8,7 @@ import Field from "../components/editor/Field.jsx";
 import Toggle from "../components/editor/Toggle.jsx";
 import ItemList from "../components/editor/ItemList.jsx";
 import PhotoField from "../components/editor/PhotoField.jsx";
-import BottomForm from "../components/editor/BottomForm.jsx";
+import SharedBottomNote from "../components/editor/SharedBottomNote.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
 import GalleryPreview from "../components/editor/preview/GalleryPreview.jsx";
 import useSiteEditor from "../editor/useSiteEditor.js";
@@ -20,13 +20,12 @@ import "../styles/siteEditor.css";
 
 const SITE = import.meta.env.VITE_SITE_URL || "http://localhost:5173";
 
-const ORDER = ["intro", "filters", "items", "focus", "bottom"];
+const ORDER = ["intro", "filters", "items", "focus"];
 const META = {
   intro:   { icon: Sparkles,  nav: "Intro",    title: "Page intro",           sub: "Heading & welcome text" },
   filters: { icon: Tag,       nav: "Tabs",     title: "Category tabs",        sub: "Names of the filter buttons" },
   items:   { icon: ImageIcon, nav: "Looks",    title: "Gallery looks",        sub: "Photos, titles, categories & descriptions" },
   focus:   { icon: Star,      nav: "In focus", title: "In-focus look",        sub: "The big featured look below the gallery" },
-  bottom:  { icon: Send,      nav: "Bottom",   title: "Bottom section",       sub: "Call-to-action & footer · shared on all pages" },
 };
 const NAV = ORDER.map((id) => ({ id, label: META[id].nav, icon: META[id].icon }));
 
@@ -44,7 +43,8 @@ export default function GalleryEditor() {
       </div></div></Layout>
     );
 
-  const { page: p, bottom } = ed.draft;
+  const p = ed.draft;
+  const bottom = ed.bottom;
   const upd = (key, patch) => ed.setPage((d) => ({ ...d, [key]: { ...d[key], ...patch } }));
   const edit = (sec, itemKey, node) => (
     <div onFocusCapture={() => ed.focusSection(sec, itemKey ? [itemKey] : [])}>{node}</div>
@@ -187,8 +187,6 @@ export default function GalleryEditor() {
         </div>
       </>
     ),
-
-    bottom: <BottomForm data={bottom} onChange={ed.setBottom} />,
   };
 
   return (
@@ -223,6 +221,7 @@ export default function GalleryEditor() {
                 </div>
               );
             })}
+            <SharedBottomNote />
           </div>
 
           <LivePreview url="saanjhbeauty.in/gallery" active={ed.active}>
