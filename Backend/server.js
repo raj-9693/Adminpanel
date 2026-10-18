@@ -15,13 +15,13 @@ const MongoDB=require("./Src/Config/DB")
 
 MongoDB()
 
-app.use("/Api/Home",RoutesHome)
+app.use("/Api/home",RoutesHome)
 app.use("/Api/gallery",Routesgallery)
 app.use("/Api/services",RoutesServices)
 app.use("/Api/about",RoutesAbout)
 app.use("/Api/contact",RoutersContact)
 app.use("/Api/booking",RoutersBooking)
-app.use("/Api/Reviews",RouterReviews)
+app.use("/Api/reviews",RouterReviews)
 app.use("/Api",RouterImage)
 app.use("/Api/bottem",RouterBottem)
 

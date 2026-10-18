@@ -2,7 +2,7 @@
 const express=require("express")
 
 const router=express.Router();
-const{PostDeta,GetDeta}=require("../Controllers/Homecontrollers")
+const{PostDeta,GetDeta,UpdateDeta}=require("../Controllers/Homecontrollers")
 
 
 // router.post("/home", PostDeta);
@@ -11,5 +11,6 @@ const{PostDeta,GetDeta}=require("../Controllers/Homecontrollers")
 
 router.post("/postDeta",PostDeta)
 router.get("/getDeta",GetDeta)
+router.put("/putDeta",UpdateDeta)
 
 module.exports = router;
