@@ -9,6 +9,7 @@ import Toggle from "../components/editor/Toggle.jsx";
 import ItemList from "../components/editor/ItemList.jsx";
 import PhotoField from "../components/editor/PhotoField.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
+import EditorGrid from "../components/editor/EditorGrid.jsx";
 import ServicesPreview from "../components/editor/preview/ServicesPreview.jsx";
 import useSiteEditor from "../editor/useSiteEditor.js";
 import useTimeAgo from "../editor/useTimeAgo.js";
@@ -176,7 +177,7 @@ export default function ServicesEditor() {
           onSave={ed.save} onReset={ed.reset} siteUrl={`${SITE}/services`}
         />
 
-        <div className="sx-grid">
+        <EditorGrid>
           <div className="sx-left">
             <SectionNav items={NAV} current={ed.open} onPick={ed.jump} />
             {ORDER.map((id) => {
@@ -200,7 +201,7 @@ export default function ServicesEditor() {
           <LivePreview url="saanjhbeauty.in/services" active={ed.active}>
             {(device) => <ServicesPreview d={p} bottom={bottom} device={device} />}
           </LivePreview>
-        </div>
+        </EditorGrid>
 
         {ed.toast && <div className="ed-toast sx-toast" role="status">{ed.toast}</div>}
       </div>

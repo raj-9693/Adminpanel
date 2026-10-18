@@ -4,6 +4,7 @@ import SectionCard from "../components/editor/SectionCard.jsx";
 import SectionNav from "../components/editor/SectionNav.jsx";
 import EditorToolbar from "../components/editor/EditorToolbar.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
+import EditorGrid from "../components/editor/EditorGrid.jsx";
 import BottomPagePreview from "../components/editor/preview/BottomPagePreview.jsx";
 import { CtaFields, BrandFields, ContactFields, SocialFields } from "../components/editor/BottomForm.jsx";
 import useSiteEditor from "../editor/useSiteEditor.js";
@@ -59,9 +60,8 @@ export default function BottomSectionEditor() {
           onSave={ed.save} onReset={ed.reset} siteUrl={SITE}
         />
 
-        <div className="sx-grid">
+        <EditorGrid>
           <div className="sx-left">
-            <p className="sx-shared"><Share2 size={15} /> This section appears at the bottom of every page — Home, Gallery, About, Booking and the rest. Change it here once and the whole website updates.</p>
             <SectionNav items={NAV} current={ed.open} onPick={(id) => { ed.jump(id); ed.focusSection(previewId[id]); }} />
 
             {ORDER.map((id) => {
@@ -85,7 +85,7 @@ export default function BottomSectionEditor() {
           <LivePreview url="saanjhbeauty.in" active={ed.active}>
             {(device) => <BottomPagePreview d={d} device={device} />}
           </LivePreview>
-        </div>
+        </EditorGrid>
 
         {ed.toast && <div className="ed-toast sx-toast" role="status">{ed.toast}</div>}
       </div>

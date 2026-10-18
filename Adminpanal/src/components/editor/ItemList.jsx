@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GripVertical, Pencil, Trash2, Plus } from "lucide-react";
+import { GripVertical, Pencil, Trash2, Plus, ChevronUp, ChevronDown } from "lucide-react";
 import useDragReorder from "../../editor/useDragReorder.js";
 
 // Compact rows + inline edit. summary(item) -> { thumb, title, subtitle }
@@ -13,6 +13,14 @@ export default function ItemList({
 
   const update = (id, patch) => onChange(items.map((it) => (it.id === id ? { ...it, ...patch } : it)));
   const remove = (id) => { onChange(items.filter((it) => it.id !== id)); setConfirm(null); if (open === id) setOpen(null); };
+  // phone par drag nahi hota, isliye up/down buttons (CSS se sirf touch/chhoti screen par dikhte hain)
+  const move = (i, d) => {
+    const j = i + d;
+    if (j < 0 || j >= items.length) return;
+    const next = [...items];
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  };
   const add = () => { const it = makeNew(); onChange([...items, it]); setOpen(it.id); };
 
   return (
@@ -31,6 +39,12 @@ export default function ItemList({
                   <small>{s.subtitle}</small>
                 </button>
                 {toggles && <span className="il-toggles">{toggles(it, (p) => update(it.id, p))}</span>}
+                {reorder && items.length > 1 && (
+                  <span className="il-move">
+                    <button type="button" className="il-ic" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move up"><ChevronUp size={16} /></button>
+                    <button type="button" className="il-ic" onClick={() => move(i, 1)} disabled={i === items.length - 1} aria-label="Move down"><ChevronDown size={16} /></button>
+                  </span>
+                )}
                 <button type="button" className="il-ic" onClick={() => setOpen(isOpen ? null : it.id)} aria-label="Edit"><Pencil size={16} /></button>
                 {canDelete && (confirm === it.id ? (
                   <span className="il-confirm">

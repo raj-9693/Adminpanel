@@ -1,0 +1,111 @@
+/* =====================================================================
+   MOBILE / TABLET — poora admin (Overview, Bookings, Website editors)
+   Breakpoints: 900px (sidebar -> drawer), 760px (tables -> cards), 520px (phones)
+   ===================================================================== */
+.menu-btn, .sidebar__close { display: none; }
+.scrim { display: none; }
+.sidebar__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 36px; }
+.sidebar__top .logo { margin-bottom: 0; }
+.sidebar { overflow-y: auto; }
+.nav { padding-bottom: 12px; }
+.sidebar__target { flex: none; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+
+  /* sidebar = left drawer */
+  .sidebar {
+    position: fixed; inset: 0 auto 0 0; z-index: 100; width: min(300px, 86vw); height: 100vh; height: 100dvh;
+    transform: translateX(-104%); transition: transform .3s cubic-bezier(.22, .8, .3, 1); box-shadow: none;
+  }
+  .sidebar.is-open { transform: none; box-shadow: 0 0 50px rgba(52, 32, 31, .35); }
+  .scrim { display: block; position: fixed; inset: 0; z-index: 90; background: rgba(52, 32, 31, .45); animation: scrim-in .25s ease; }
+  @keyframes scrim-in { from { opacity: 0; } to { opacity: 1; } }
+  body.nav-lock { overflow: hidden; }
+  .sidebar__close, .menu-btn { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border: 1px solid var(--border); border-radius: 12px; background: var(--cream); color: var(--ink); }
+  .nav__item, .nav__sub-item { min-height: 46px; }
+  .sidebar__top { margin-bottom: 24px; }
+
+  /* topbar */
+  .topbar { position: sticky; top: 0; z-index: 40; gap: 10px; padding: 0 16px; background: var(--cream); }
+  .search { min-width: 0; }
+  .topbar__right { gap: 10px; flex: none; }
+  .user { gap: 0; }
+  .user > :not(.avatar) { display: none; }
+  .content { padding: 20px 16px 32px; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  .content > * { min-width: 0; }
+  .page-head, .page-head--end { align-items: stretch; }
+}
+
+@media (max-width: 760px) {
+  .page-head { gap: 14px; }
+  .page-head__title { font-size: 32px; }
+  .page-head .btn-add, .page-head__actions .btn-add, .page-head__actions .btn-outline { flex: 1; justify-content: center; }
+  .page-head__actions { flex-wrap: wrap; }
+  .card { padding: 18px; }
+  .card__head { flex-wrap: wrap; gap: 8px 12px; margin-bottom: 14px; }
+
+  /* dashboard */
+  .stats { gap: 12px; }
+  .stat { padding: 16px; }
+  .stat__label { font-size: 13.5px; }
+  .stat__value { font-size: 30px; margin: 6px 0; }
+  .pipeline__labels { grid-template-columns: repeat(3, 1fr); gap: 14px 8px; }
+  .target { justify-content: center; text-align: center; }
+  .list__item { gap: 12px; }
+  .wedding { gap: 12px; }
+
+  /* bookings: filters */
+  .main .filters { padding: 16px 16px 0; }
+  .main .filters__row { gap: 10px; }
+  .main .search--wide { flex: 1 1 100%; }
+  .main .filters__row > .select-btn { flex: 1 1 calc(50% - 30px); justify-content: space-between; }
+  .main .filters__row--tabs { margin-top: 12px; gap: 12px; }
+  .main .tabs { margin-right: 0; }
+  .main .segmented { align-self: stretch; margin-bottom: 14px; }
+  .main .segmented__btn { flex: 1; justify-content: center; }
+  .main .table-toolbar { flex-wrap: wrap; gap: 10px 18px; padding: 14px 16px; }
+  .main .pager { align-items: stretch; padding: 16px; }
+  .main .pager__btns { flex-wrap: wrap; justify-content: center; }
+  .main .pager__info { text-align: center; }
+
+  /* bookings: table -> cards */
+  .main .table-scroll { overflow: visible; }
+  .main .table, .main .table tbody { display: block; min-width: 0; width: 100%; }
+  .main .table thead { display: none; }
+  .main .table tr { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; padding: 18px 16px; border-bottom: 1px solid var(--border); }
+  .main .table tbody tr:last-child { border-bottom: 0; }
+  .main .table td, .main .table td:first-child, .main .table td:last-child { display: block; width: auto; min-width: 0; padding: 0; border: 0; }
+  .main .table td::before { content: attr(data-label); display: block; margin-bottom: 3px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .main .table td.col-check, .main .table td.col-actions { position: absolute; }
+  .main .table td.col-check { top: 18px; right: 56px; }
+  .main .table td.col-actions { top: 11px; right: 10px; }
+  .main .table td.col-check::before, .main .table td.col-actions::before { display: none; }
+  .main .table td[data-label="Reference"] { grid-column: 1 / -1; padding-right: 100px; }
+  .main .table td[data-label="Reference"]::before { display: none; }
+  .main .table td[data-label="Bride"] { grid-column: 1 / -1; }
+  .main .table td[data-label="Bride"] .cell-strong { font-size: 17px; }
+  .main .table td[data-label="Bride"]::before { display: none; }
+  .main .table td[data-label="Status"], .main .table td[data-label="Venue"] { grid-column: 1 / -1; }
+  .main .phone { gap: 8px; } .main .phone span { max-width: none; white-space: nowrap; }
+}
+
+@media (max-width: 520px) {
+  .topbar { padding: 0 12px; }
+  .bell { width: 42px; height: 42px; }
+  .content { padding: 16px 12px 28px; }
+  .page-head__title { font-size: 28px; }
+  .stat__value { font-size: 26px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .ring { width: 112px; height: 112px; }
+  .main .filters__row > .select-btn { flex: 1 1 100%; }
+  .main .tab { padding: 12px 12px; font-size: 14px; }
+}
+@media (max-width: 360px) { .stats { grid-template-columns: 1fr; } }
+
+/* tablet + phone: tabs row ko card ki width me rakho (flex-wrap column me line content-width ki ho jaati thi) */
+@media (max-width: 1100px) {
+  .main .filters__row--tabs { flex-wrap: nowrap; }
+  .main .tabs { min-width: 0; max-width: 100%; }
+}
+.list__item .link, .card__head .link { white-space: nowrap; }

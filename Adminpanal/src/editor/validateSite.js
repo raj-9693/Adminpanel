@@ -36,6 +36,7 @@ export function validateAbout(p) {
   if (!p.story.image) add('story', 'Add a portrait photo.');
   p.numbers.items.forEach((n, i) => blank(n.value) && add('numbers', `Number ${i + 1} is empty.`));
   p.process.items.forEach((s, i) => blank(s.title) && add('process', `Step ${i + 1} needs a title.`));
+  p.artists.items.forEach((a, i) => blank(a.name) && add('artists', `Artist ${i + 1} needs a name.`));
   p.travel.cities.forEach((c, i) => blank(c.label) && add('travel', `City ${i + 1} is empty.`));
   p.kit.brands.forEach((b, i) => blank(b.label) && add('kit', `Brand ${i + 1} is empty.`));
   return e;

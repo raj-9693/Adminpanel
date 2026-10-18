@@ -192,6 +192,21 @@ export const aboutDefaults = {
       { id: 'st4', title: 'Touch-ups', text: 'A final check before you step out, plus thoughtful guidance for effortless wear through celebration.' },
     ],
   },
+  artists: {
+    eyebrow: 'Meet the artists',
+    title: 'The hands that keep your morning calm.',
+    note: 'Every Saanjh artist is trained in our listen-first way of working, so your look always feels like you.',
+    items: [
+      { id: 'ar1', image: img('artist1', 600, 760), imageName: '', years: '9 yrs', role: 'Lead mehndi artist', name: 'Meera Joshi',
+        bio: 'Fine-line bridal henna with story-led motifs, drawn slowly so every curve is kept.', tags: 'Bridal mehndi, Rajasthani' },
+      { id: 'ar2', image: img('artist2', 600, 760), imageName: '', years: '8 yrs', role: 'Senior dulhan makeup artist', name: 'Pooja Verma',
+        bio: 'Luminous skin and a soft, long-wear bridal finish that still looks like you.', tags: 'HD finish, Airbrush' },
+      { id: 'ar3', image: img('artist3', 600, 760), imageName: '', years: '7 yrs', role: 'Hair & dupatta stylist', name: 'Sana Siddiqui',
+        bio: 'Braids, buns and veil setting that stay perfectly in place from pheras to the last dance.', tags: 'Bridal buns, Dupatta setting' },
+      { id: 'ar4', image: img('artist4', 600, 760), imageName: '', years: '6 yrs', role: 'Arabic mehndi artist', name: 'Aarti Nair',
+        bio: 'Flowing vines with generous negative space, for brides and the whole mehndi circle.', tags: 'Arabic, Guest mehndi' },
+    ],
+  },
   travel: {
     eyebrow: 'Where Saanjh travels',
     title: 'Near your people, wherever they gather.',

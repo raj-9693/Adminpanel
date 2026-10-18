@@ -1,4 +1,4 @@
-import { Sparkles, UserRound, Hash, ListOrdered, MapPin, Briefcase } from "lucide-react";
+import { Sparkles, UserRound, Hash, ListOrdered, MapPin, Briefcase, Users } from "lucide-react";
 import Layout from "../components/Layout";
 import SectionCard from "../components/editor/SectionCard.jsx";
 import SectionNav from "../components/editor/SectionNav.jsx";
@@ -8,6 +8,7 @@ import ItemList from "../components/editor/ItemList.jsx";
 import PhotoField from "../components/editor/PhotoField.jsx";
 import SharedBottomNote from "../components/editor/SharedBottomNote.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
+import EditorGrid from "../components/editor/EditorGrid.jsx";
 import AboutPreview from "../components/editor/preview/AboutPreview.jsx";
 import useSiteEditor from "../editor/useSiteEditor.js";
 import useTimeAgo from "../editor/useTimeAgo.js";
@@ -18,12 +19,13 @@ import "../styles/siteEditor.css";
 
 const SITE = import.meta.env.VITE_SITE_URL || "http://localhost:5173";
 
-const ORDER = ["hero", "story", "numbers", "process", "travel", "kit"];
+const ORDER = ["hero", "story", "numbers", "process", "artists", "travel", "kit"];
 const META = {
   hero:    { icon: Sparkles,   nav: "Intro",   title: "Page intro",        sub: "Heading & welcome text" },
   story:   { icon: UserRound,  nav: "Story",   title: "Artist’s note",     sub: "Portrait, personal story & key numbers" },
   numbers: { icon: Hash,       nav: "Numbers", title: "Highlights band",   sub: "Four proof points on the maroon strip" },
   process: { icon: ListOrdered,nav: "Process", title: "Our process",       sub: "Steps from first hello to final touch" },
+  artists: { icon: Users,      nav: "Artists", title: "Meet the artists",  sub: "Team cards with photo, role & specialities" },
   travel:  { icon: MapPin,     nav: "Travel",  title: "Where we travel",   sub: "Text & list of cities" },
   kit:     { icon: Briefcase,  nav: "Kit",     title: "Our kit",           sub: "Brands we use & skin-care note" },
 };
@@ -95,13 +97,13 @@ export default function AboutEditor() {
 
     numbers: (
       <>
-        {p.numbers.items.map((n, i) => edit("numbers", `num-${n.id}`, (
-          <div key={n.id} className="sx-pair">
+        {p.numbers.items.map((n, i) => <div key={n.id}>{edit("numbers", `num-${n.id}`, (
+          <div className="sx-pair">
             <span className="sx-pair-n">{i + 1}</span>
             <Field label="Number" max={12} value={n.value} onChange={(v) => upd("numbers", { items: patchIn(p.numbers.items, n.id, { value: v }) })} />
             <Field label="Label" max={28} value={n.label} onChange={(v) => upd("numbers", { items: patchIn(p.numbers.items, n.id, { label: v }) })} />
           </div>
-        )))}
+        ))}</div>)}
         <p className="fd-note">Type each number exactly as it should appear — “4.9/5”, “200+”, “1:1”.</p>
       </>
     ),
@@ -128,6 +130,42 @@ export default function AboutEditor() {
             ))}
           />
           <p className="fd-note">Step numbers (01, 02…) are added automatically in order. Drag to reorder.</p>
+        </div>
+      </>
+    ),
+
+    artists: (
+      <>
+        <Field label="Small heading" caps max={40} value={p.artists.eyebrow} onChange={(v) => upd("artists", { eyebrow: v })} />
+        <Field label="Section title" as="textarea" rows={2} max={80} value={p.artists.title} onChange={(v) => upd("artists", { title: v })} />
+        <Field label="Note (top right)" as="textarea" rows={2} max={160} value={p.artists.note} onChange={(v) => upd("artists", { note: v })} />
+        <div className="fd">
+          <span className="fd-label">Artists · {p.artists.items.length}</span>
+          <ItemList
+            items={p.artists.items}
+            onChange={(l) => upd("artists", { items: l })}
+            addLabel="Add artist"
+            canAdd={p.artists.items.length < 8}
+            canDelete={p.artists.items.length > 1}
+            makeNew={() => ({ id: uid(), image: "", imageName: "", years: "", role: "", name: "", bio: "", tags: "" })}
+            summary={(a) => ({
+              thumb: a.image ? <img src={a.image} alt="" /> : <Users size={18} />,
+              title: a.name || "New artist",
+              subtitle: [a.role, a.years].filter(Boolean).join(" · ") || "Add role & experience",
+            })}
+            editor={(a, pt) => edit("artists", `artist-${a.id}`, (
+              <>
+                <PhotoField label="Photo" hint="Portrait photo (4:5) works best" src={a.image} name={a.imageName} onChange={(v) => pt({ image: v.src, imageName: v.name })} />
+                <div className="fd-row">
+                  <Field label="Name" max={40} value={a.name} onChange={(v) => pt({ name: v })} />
+                  <Field label="Experience badge" max={10} placeholder="9 yrs" value={a.years} onChange={(v) => pt({ years: v })} />
+                </div>
+                <Field label="Role" caps max={40} placeholder="Lead mehndi artist" value={a.role} onChange={(v) => pt({ role: v })} />
+                <Field label="Short description" as="textarea" rows={3} max={140} value={a.bio} onChange={(v) => pt({ bio: v })} />
+                <Field label="Specialities" max={80} placeholder="Bridal mehndi, Rajasthani" hint="Separate with commas — each becomes a small tag" value={a.tags} onChange={(v) => pt({ tags: v })} />
+              </>
+            ))}
+          />
         </div>
       </>
     ),
@@ -167,7 +205,7 @@ export default function AboutEditor() {
           onSave={ed.save} onReset={ed.reset} siteUrl={`${SITE}/about`}
         />
 
-        <div className="sx-grid">
+        <EditorGrid>
           <div className="sx-left">
             <SectionNav items={NAV} current={ed.open} onPick={ed.jump} />
             {ORDER.map((id) => {
@@ -191,7 +229,7 @@ export default function AboutEditor() {
           <LivePreview url="saanjhbeauty.in/about" active={ed.active}>
             {(device) => <AboutPreview d={p} bottom={bottom} device={device} />}
           </LivePreview>
-        </div>
+        </EditorGrid>
 
         {ed.toast && <div className="ed-toast sx-toast" role="status">{ed.toast}</div>}
       </div>

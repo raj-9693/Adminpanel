@@ -7,6 +7,7 @@ import SharedBottomNote from "../components/editor/SharedBottomNote.jsx";
 import Field from "../components/editor/Field.jsx";
 import ItemList from "../components/editor/ItemList.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
+import EditorGrid from "../components/editor/EditorGrid.jsx";
 import BookingPreview from "../components/editor/preview/BookingPreview.jsx";
 import { ICONS, ICON_OPTIONS } from "../components/editor/icons.js";
 import useSiteEditor from "../editor/useSiteEditor.js";
@@ -166,9 +167,8 @@ export default function BookingEditor() {
           onSave={ed.save} onReset={ed.reset} siteUrl={`${SITE}/booking`}
         />
 
-        <div className="sx-grid">
+        <EditorGrid>
           <div className="sx-left">
-            <p className="sx-shared"><ShieldCheck size={15} /> This is the live booking form. You can change its wording and service choices here. Held dates and customers’ bookings are managed in <b>Bookings</b>, not on this page.</p>
             <SectionNav items={NAV} current={ed.open} onPick={ed.jump} />
             {ORDER.map((id) => {
               const m = META[id];
@@ -191,7 +191,7 @@ export default function BookingEditor() {
           <LivePreview url="saanjhbeauty.in/booking" active={ed.active}>
             {(device) => <BookingPreview d={p} bottom={bottom} device={device} />}
           </LivePreview>
-        </div>
+        </EditorGrid>
 
         {ed.toast && <div className="ed-toast sx-toast" role="status">{ed.toast}</div>}
       </div>

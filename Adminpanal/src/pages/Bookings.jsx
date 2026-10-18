@@ -94,22 +94,22 @@ export default function Bookings() {
                 {bookingRows.map((r) => (
                   <tr key={r.id}>
                     <td className="col-check"><input type="checkbox" className="check" aria-label={`Select ${r.bride}`} /></td>
-                    <td><span className="ref">{r.ref}</span></td>
-                    <td>
+                    <td data-label="Reference"><span className="ref">{r.ref}</span></td>
+                    <td data-label="Bride">
                       <div className="cell-strong">{r.bride}</div>
                       <div className="cell-muted">{r.type}</div>
                     </td>
-                    <td>{r.service}</td>
-                    <td>
+                    <td data-label="Service">{r.service}</td>
+                    <td data-label="Wedding date">
                       <div className="cell-strong">{r.date}</div>
                       <div className="cell-muted">{r.day}</div>
                     </td>
-                    <td className="cell-soft">{r.venue}</td>
-                    <td>
+                    <td className="cell-soft" data-label="Venue">{r.venue}</td>
+                    <td data-label="Phone">
                       <a href="#chat" className="phone"><ChatIcon /> <span>{r.phone}</span></a>
                     </td>
-                    <td className="cell-soft">{r.created}</td>
-                    <td>
+                    <td className="cell-soft" data-label="Created">{r.created}</td>
+                    <td data-label="Status">
                       <button className={`pill pill--${r.tone}`}>
                         {r.status} <ChevronDownIcon width="14" height="14" />
                       </button>

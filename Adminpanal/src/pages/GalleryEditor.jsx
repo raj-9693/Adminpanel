@@ -10,6 +10,7 @@ import ItemList from "../components/editor/ItemList.jsx";
 import PhotoField from "../components/editor/PhotoField.jsx";
 import SharedBottomNote from "../components/editor/SharedBottomNote.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
+import EditorGrid from "../components/editor/EditorGrid.jsx";
 import GalleryPreview from "../components/editor/preview/GalleryPreview.jsx";
 import useSiteEditor from "../editor/useSiteEditor.js";
 import useTimeAgo from "../editor/useTimeAgo.js";
@@ -198,7 +199,7 @@ export default function GalleryEditor() {
           onSave={ed.save} onReset={ed.reset} siteUrl={`${SITE}/gallery`}
         />
 
-        <div className="sx-grid">
+        <EditorGrid>
           <div className="sx-left">
             <SectionNav items={NAV} current={ed.open} onPick={ed.jump} />
 
@@ -227,7 +228,7 @@ export default function GalleryEditor() {
           <LivePreview url="saanjhbeauty.in/gallery" active={ed.active}>
             {(device) => <GalleryPreview d={p} bottom={bottom} device={device} />}
           </LivePreview>
-        </div>
+        </EditorGrid>
 
         {ed.toast && <div className="ed-toast sx-toast" role="status">{ed.toast}</div>}
       </div>

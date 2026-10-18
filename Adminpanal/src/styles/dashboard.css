@@ -139,8 +139,6 @@
   .row-2, .row-2--equal { grid-template-columns: 1fr; }
 }
 @media (max-width: 800px) {
-  .app { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
   .page-head { flex-direction: column; gap: 16px; }
 }
 

@@ -5,7 +5,7 @@ const pad = (n) => String(n).padStart(2, "0");
 
 // Website ke About page ka live mock. d = about draft, bottom = shared CTA+footer.
 export default function AboutPreview({ d, bottom, device }) {
-  const { hero, story, numbers, process, travel, kit } = d;
+  const { hero, story, numbers, process, artists, travel, kit } = d;
 
   return (
     <div className={`sp ${device === "mobile" ? "m" : ""}`}>
@@ -51,6 +51,34 @@ export default function AboutPreview({ d, bottom, device }) {
               <span className="sp-num">{pad(i + 1)}</span>
               <h3>{s.title}</h3>
               <p>{s.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="sp-sec sp-artists" data-sec="artists">
+        <div className="sp-sechead">
+          <div>
+            <p className="sp-eb">{artists.eyebrow}</p>
+            <h2>{artists.title}</h2>
+          </div>
+          <p className="sp-aside">{artists.note}</p>
+        </div>
+        <div className="sp-agrid">
+          {artists.items.map((a, i) => (
+            <article key={a.id} className="sp-acard" data-sec={`artist-${a.id}`}>
+              <div className="sp-acard-img">
+                <Pic src={a.image} alt={a.name} i={i} />
+                {a.years && <span className="sp-years">{a.years}</span>}
+              </div>
+              <div className="sp-acard-b">
+                <p className="sp-acard-role">{a.role}</p>
+                <h3>{a.name || "Artist name"}</h3>
+                <p className="sp-acard-bio">{a.bio}</p>
+                <div className="sp-tags">
+                  {String(a.tags || "").split(",").map((t) => t.trim()).filter(Boolean).map((t) => <span key={t}>{t}</span>)}
+                </div>
+              </div>
             </article>
           ))}
         </div>

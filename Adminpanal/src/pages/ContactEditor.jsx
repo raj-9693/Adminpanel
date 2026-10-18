@@ -8,6 +8,7 @@ import Field from "../components/editor/Field.jsx";
 import Toggle from "../components/editor/Toggle.jsx";
 import ItemList from "../components/editor/ItemList.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
+import EditorGrid from "../components/editor/EditorGrid.jsx";
 import ContactPreview from "../components/editor/preview/ContactPreview.jsx";
 import { CONTACT_ICONS, CONTACT_ICON_OPTIONS } from "../components/editor/contactIcons.jsx";
 import useSiteEditor from "../editor/useSiteEditor.js";
@@ -174,7 +175,7 @@ export default function ContactEditor() {
           onSave={ed.save} onReset={ed.reset} siteUrl={`${SITE}/contact`}
         />
 
-        <div className="sx-grid">
+        <EditorGrid>
           <div className="sx-left">
             <SectionNav items={NAV} current={ed.open} onPick={ed.jump} />
             {ORDER.map((id) => {
@@ -198,7 +199,7 @@ export default function ContactEditor() {
           <LivePreview url="saanjhbeauty.in/contact" active={ed.active}>
             {(device) => <ContactPreview d={p} bottom={bottom} device={device} />}
           </LivePreview>
-        </div>
+        </EditorGrid>
 
         {ed.toast && <div className="ed-toast sx-toast" role="status">{ed.toast}</div>}
       </div>

@@ -9,7 +9,7 @@ const WIDTH = { desktop: 1100, mobile: 390 };
 // active   = ["item-xyz", "items"]  -> pehla jo `data-sec` mile, preview usi tak smooth scroll karta hai
 //            aur usko highlight (data-on) karta hai. Employee jis section me type kare, wahi side me dikhta hai.
 export default function LivePreview({ url, children, active = [] }) {
-  const [device, setDevice] = useState("desktop");
+  const [device, setDevice] = useState(() => (typeof window !== "undefined" && window.innerWidth < 700 ? "mobile" : "desktop"));
   const [m, setM] = useState({ s: 0.5, h: 0 });
   const view = useRef(null);
   const page = useRef(null);
@@ -21,6 +21,7 @@ export default function LivePreview({ url, children, active = [] }) {
     const v = view.current, p = page.current;
     if (!v || !p) return;
     const calc = () => {
+      if (!v.clientWidth) return; // preview tab chhupa ho to skip
       const avail = v.clientWidth - (device === "mobile" ? 32 : 0);
       const s = Math.min(1, avail / W);
       setM({ s, h: p.offsetHeight * s });
@@ -48,7 +49,7 @@ export default function LivePreview({ url, children, active = [] }) {
       v.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
     }, 80);
     return () => { clearTimeout(t); el.removeAttribute("data-on"); };
-  }, [key, device]);
+  }, [key, device, m.s]);
 
   return (
     <aside className="lp" aria-label="Live preview">

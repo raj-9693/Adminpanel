@@ -8,6 +8,7 @@ import ItemList from "../components/editor/ItemList.jsx";
 import PhotoField from "../components/editor/PhotoField.jsx";
 import SharedBottomNote from "../components/editor/SharedBottomNote.jsx";
 import LivePreview from "../components/editor/LivePreview.jsx";
+import EditorGrid from "../components/editor/EditorGrid.jsx";
 import HomePreview from "../components/editor/preview/HomePreview.jsx";
 import { ICONS, ICON_OPTIONS } from "../components/editor/icons.js";
 import useSiteEditor from "../editor/useSiteEditor.js";
@@ -212,7 +213,7 @@ export default function HomePageEditor() {
           onSave={ed.save} onReset={ed.reset} siteUrl={SITE}
         />
 
-        <div className="sx-grid">
+        <EditorGrid>
           {/* LEFT: forms (apna alag scroll) */}
           <div className="sx-left">
             <SectionNav items={NAV} current={ed.open} onPick={ed.jump} />
@@ -243,7 +244,7 @@ export default function HomePageEditor() {
           <LivePreview url="saanjhbeauty.in" active={ed.active}>
             {(device) => <HomePreview d={p} bottom={bottom} device={device} />}
           </LivePreview>
-        </div>
+        </EditorGrid>
 
         {ed.toast && <div className="ed-toast sx-toast" role="status">{ed.toast}</div>}
       </div>

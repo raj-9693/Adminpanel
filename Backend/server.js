@@ -9,6 +9,7 @@ const RoutersContact=require("./Src/routers/ContactRouter")
 const RoutersBooking=require("./Src/routers/Bookingrouter")
 const RouterReviews=require("./Src/routers/Reviewsrouter")
 const RouterImage=require("./Src/routers/uploadRouter")
+const RouterBottem=require("./Src/routers/Bottemrouter")
 
 const MongoDB=require("./Src/Config/DB")
 
@@ -22,6 +23,7 @@ app.use("/Api/contact",RoutersContact)
 app.use("/Api/booking",RoutersBooking)
 app.use("/Api/Reviews",RouterReviews)
 app.use("/Api",RouterImage)
+app.use("/Api/bottem",RouterBottem)
 
 
 

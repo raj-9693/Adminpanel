@@ -32,12 +32,18 @@
 @keyframes sx-rot { to { transform: rotate(360deg); } }
 @keyframes sx-pulse { 50% { opacity: .35; } }
 
-/* ---------- quick section chips ---------- */
-.sx-nav { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 14px; margin-bottom: 4px; background: linear-gradient(var(--cream) 82%, rgba(255, 250, 244, 0)); scrollbar-width: none; }
+/* ---------- quick section chips (sticky) ---------- */
+.sx-navwrap { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 4px 0 12px; background: linear-gradient(var(--cream) 85%, rgba(255, 250, 244, 0)); }
+.sx-nav { flex: 1; min-width: 0; display: flex; gap: 8px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .sx-nav::-webkit-scrollbar { display: none; }
-.sx-nav button { display: inline-flex; flex: none; align-items: center; gap: 7px; padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px; background: #fffdfa; color: var(--text); font: 600 13px var(--sans); transition: background .2s, color .2s, border-color .2s; }
+.sx-nav button { display: inline-flex; flex: none; align-items: center; gap: 7px; padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px; background: #fffdfa; color: var(--text); font: 600 13px var(--sans); white-space: nowrap; transition: background .2s, color .2s, border-color .2s; }
 .sx-nav button:hover { border-color: var(--gold-soft); color: var(--ink); }
 .sx-nav button.on { background: var(--maroon); border-color: var(--maroon); color: #fff; }
+.sx-nav-arrow { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%; background: #fffdfa; color: var(--maroon); box-shadow: 0 4px 12px rgba(122, 53, 65, .14); transition: transform .2s var(--ease), border-color .2s; }
+.sx-nav-arrow:hover { border-color: var(--gold-soft); transform: scale(1.06); }
+
+/* mobile: Edit | Preview tabs (laptop par chhupe rehte hain) */
+.sx-tabs { display: none; }
 
 /* ---------- form helpers ---------- */
 .sx-pair { display: grid; grid-template-columns: 30px 1fr 1fr; gap: 14px; align-items: end; }
@@ -471,17 +477,94 @@
 .sx-note-link { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 10px; background: var(--maroon); color: #fff; font: 600 13px var(--sans); text-decoration: none; transition: background .25s, transform .25s var(--ease); }
 .sx-note-link:hover { background: var(--maroon-d); transform: translateY(-1px); }
 
-/* ---------- chhoti screens: page normal scroll, pane upar-niche ---------- */
+
+/* ---------- About: artists cards ---------- */
+.sp-artists { padding-top: 24px; }
+.sp-agrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.sp-acard { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #fffdfa; box-shadow: 0 8px 24px rgba(122, 53, 65, .08); }
+.sp-acard-img { position: relative; aspect-ratio: 4 / 5; }
+.sp-acard-img .sp-pic { height: 100%; }
+.sp-years { position: absolute; left: 12px; top: 12px; padding: 6px 13px; border-radius: 999px; background: rgba(255, 253, 250, .95); font-size: 11.5px; font-weight: 700; color: var(--ink); }
+.sp-acard-b { padding: 18px 18px 20px; }
+.sp-acard-role { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.sp-acard h3 { margin: 6px 0 8px; font-size: 26px; line-height: 1.1; }
+.sp-acard-bio { min-height: 62px; font-size: 12.5px; line-height: 1.65; }
+.sp-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.sp-tags span { padding: 6px 12px; border-radius: 999px; background: #f5e6da; font-size: 11.5px; font-weight: 600; color: var(--b); }
+.sp.m .sp-agrid { grid-template-columns: 1fr; }
+.sp.m .sp-artists { padding-top: 8px; }
+
+/* ---------- reorder arrows (touch) ---------- */
+.il-move { display: none; flex: none; gap: 0; }
+.il-ic:disabled { opacity: .3; pointer-events: none; }
+@media (hover: none), (max-width: 900px) {
+  .il-move { display: inline-flex; }
+  .il-grip { display: none !important; }
+}
+
+/* =====================================================================
+   MOBILE / TABLET — website editors
+   ===================================================================== */
 @media (max-width: 1100px) {
-  .ed-page.sx { height: auto; overflow: visible; }
-  .sx-grid { grid-template-columns: 1fr; }
-  .sx-left { overflow: visible; padding-right: 2px; }
-  .sx .lp { height: 680px; }
-  .sx-nav { top: 0; }
+  .ed-page.sx { height: auto; overflow: visible; gap: 14px; padding: 18px 20px 48px; }
+  .sx-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: 14px; background: #f6e9de; }
+  .sx-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--text); font: 600 14.5px var(--sans); transition: background .2s, color .2s; }
+  .sx-tabs button.on { background: #fffdfa; color: var(--maroon); box-shadow: 0 2px 8px rgba(122, 53, 65, .14); }
+  .sx-grid { display: block; }
+  .sx-grid[data-view="edit"] .lp { display: none; }
+  .sx-grid[data-view="preview"] .sx-left { display: none; }
+  .sx-left { overflow: visible; padding: 0 0 40px; scrollbar-gutter: auto; }
+  .sx .lp { height: calc(100vh - 220px); height: calc(100dvh - 220px); min-height: 460px; padding: 14px; }
+  .sx-navwrap { top: 0; }
+  .il-ic { width: 40px; height: 40px; }
+  .ed-page input, .ed-page textarea, .ed-page select { font-size: 16px; }
+}
+@media (max-width: 900px) {
+  .sx-navwrap { top: 66px; }   /* topbar sticky hai, chips uske neeche chipakte hain */
+}
+@media (max-width: 760px) {
+  .ed-page.sx { padding: 16px 14px 40px; }
+  .sx-title { font-size: 27px !important; }
+  .sx-bar { gap: 12px; }
+  .sx-bar-r { width: 100%; gap: 8px; }
+  .sx-status { order: -2; flex: 1 1 100%; justify-content: center; padding: 8px 12px; font-size: 12.5px; }
+  .sx-save { order: -1; flex: 1 1 100%; height: 48px; }
+  .sx-btn { flex: 1 1 calc(50% - 4px); min-width: 0; justify-content: center; height: 46px; padding: 0 10px; font-size: 13.5px; }
+  .sx-toast { left: 16px; right: 16px; bottom: 16px; width: auto; transform: none; text-align: center; animation: none; }
+  .lp-head { flex-wrap: wrap; gap: 8px 10px; }
+  .lp-hint { font-size: 12px; }
+  .sx-modal { padding: 12px; }
+  .sx-modal-card { padding: 16px; max-height: 88vh; }
+  .sx-pick { grid-template-columns: repeat(3, 1fr); }
+  .sx-note { padding: 16px; }
+  .sx-note-link { width: 100%; justify-content: center; }
+}
+
+/* ---------- chhoti screens: form helpers ---------- */
+@media (max-width: 640px) {
+  .sx-pair { grid-template-columns: 1fr; }
+  .sx-pair-n { display: none; }
+}
+
+/* phone: list row ke buttons dusri line me, taaki naam poora dikhe */
+@media (max-width: 640px) {
+  .il-row { flex-wrap: wrap; row-gap: 2px; }
+  .il-main { flex: 1 1 calc(100% - 64px); min-width: 0; }
+  .il-main b, .il-main small { white-space: normal; }
+  .il-row > .il-move { margin-left: auto; }
+  .il-row > .il-ic[aria-label="Edit"] { margin-left: auto; }
+  .il-row > .il-move ~ .il-ic[aria-label="Edit"] { margin-left: 0; }
+  .il-toggles { order: 5; width: 100%; justify-content: flex-start; }
+}
+
+/* phone: preview header ek line me, list rows me akela pencil chhupao (row tap se khulti hai) */
+@media (max-width: 760px) {
+  .lp-head { flex-wrap: nowrap; }
+  .lp-chip { display: none; }
+  .lp-dev { margin-left: auto; }
+  .lp-dev button { width: 42px; height: 42px; }
+  .sx-btn { height: 44px; }
 }
 @media (max-width: 640px) {
-  .ed-page.sx { padding: 20px 14px 40px; }
-  .sx-pair { grid-template-columns: 1fr; } .sx-pair-n { display: none; }
-  .sx-pick { grid-template-columns: repeat(3, 1fr); }
-  .sx-bar-r > * { flex: 1 1 auto; justify-content: center; }
+  .il-row > .il-ic[aria-label="Edit"]:last-child { display: none; }
 }

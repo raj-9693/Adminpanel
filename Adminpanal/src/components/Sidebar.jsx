@@ -25,7 +25,7 @@ function ChevronIcon({ open }) {
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose }) {
   const location = useLocation();
   const isWebsiteActive = location.pathname.startsWith('/website');
   const [websiteOpen, setWebsiteOpen] = useState(isWebsiteActive);
@@ -35,9 +35,14 @@ export default function Sidebar() {
   const websiteGroup = navItems.filter(i => i.group === 'website' && !i.isGroup);
 
   return (
-    <aside className="sidebar">
-      <Logo />
-      <nav className="nav">
+    <aside className={'sidebar' + (open ? ' is-open' : '')} aria-label="Main menu">
+      <div className="sidebar__top">
+        <Logo />
+        <button type="button" className="sidebar__close" onClick={onClose} aria-label="Close menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+      <nav className="nav" onClick={(e) => { if (e.target.closest('a') && onClose) onClose(); }}>
 
         {/* Overview */}
         {topItems.map((item) => {
