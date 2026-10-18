@@ -12,7 +12,11 @@ const PostDeta = async (req, res) => {
     !Array.isArray(data.numbers?.items) ||
     data.numbers.items.length === 0 ||
     !Array.isArray(data.process?.items) ||
-    data.process.items.length === 0
+    data.process.items.length === 0 ||
+        !Array.isArray(data.process?.items) ||
+    data.process.items.length === 0 ||
+    !Array.isArray(data.artists?.items) ||
+    data.artists.items.length === 0
   ) {
     return res.status(400).json({
       success: false,

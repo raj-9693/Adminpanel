@@ -51,6 +51,25 @@ const AboutSchema = new mongoose.Schema(
       ],
     },
 
+    artists: {
+      eyebrow: { type: String, default: "" },
+      title: { type: String, default: "" },
+      note: { type: String, default: "" },
+      items: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          image: { type: String, default: "" },
+          imageName: { type: String, default: "" },
+          years: { type: String, default: "" }, // "9 yrs" text hai
+          role: { type: String, default: "" },
+          name: { type: String, required: true, trim: true },
+          bio: { type: String, default: "" },
+          tags: { type: String, default: "" }, // "Bridal mehndi, Rajasthani" comma wali string
+        },
+      ],
+    },
+
     travel: {
       eyebrow: { type: String, default: "" },
       title: { type: String, default: "" },
