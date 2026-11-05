@@ -9,6 +9,13 @@ import { uid } from "../../editor/imageTools.js";
 
 const noEdit = (_s, _k, node) => node;
 
+// Footer link kis page par jaayega (website ke routes)
+const PAGE_OPTIONS = [
+  { value: "/", label: "Home" }, { value: "/gallery", label: "Gallery" }, { value: "/services", label: "Services" },
+  { value: "/reviews", label: "Reviews" }, { value: "/about", label: "About" }, { value: "/booking", label: "Booking" },
+  { value: "/contact", label: "Contact" },
+];
+
 export function CtaFields({ data, onChange }) {
   const { cta } = data;
   const set = (patch) => onChange({ ...data, cta: { ...cta, ...patch } });
@@ -44,9 +51,14 @@ export function BrandFields({ data, onChange, edit = noEdit }) {
               addLabel="Add link"
               canAdd={f.links.length < 6}
               canDelete={f.links.length > 1}
-              makeNew={() => ({ id: uid(), label: "" })}
-              summary={(l) => ({ thumb: <Link2 size={18} />, title: l.label || "New link", subtitle: "Footer link" })}
-              editor={(l, p) => <Field label="Link text" max={30} value={l.label} onChange={(v) => p({ label: v })} />}
+              makeNew={() => ({ id: uid(), label: "", to: "/" })}
+              summary={(l) => ({ thumb: <Link2 size={18} />, title: l.label || "New link", subtitle: PAGE_OPTIONS.find((o) => o.value === l.to)?.label || "Footer link" })}
+              editor={(l, p) => (
+                <>
+                  <Field label="Link text" max={30} value={l.label} onChange={(v) => p({ label: v })} />
+                  <Field label="Opens page" as="select" options={PAGE_OPTIONS} value={l.to || "/"} onChange={(v) => p({ to: v })} />
+                </>
+              )}
             />
           </div>
         </>

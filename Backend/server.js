@@ -1,5 +1,7 @@
 require("dotenv").config()
 const app=require("./Src/app")
+const cors = require("cors");
+   
 
 const RoutesHome=require("./Src/routers/Homerouter")
 const Routesgallery=require("./Src/routers/Galleryrouter")
@@ -15,6 +17,8 @@ const MongoDB=require("./Src/Config/DB")
 
 MongoDB()
 
+app.use(cors({ origin: "http://localhost:5173" }));
+
 app.use("/Api/home",RoutesHome)
 app.use("/Api/gallery",Routesgallery)
 app.use("/Api/services",RoutesServices)
@@ -24,6 +28,8 @@ app.use("/Api/booking",RoutersBooking)
 app.use("/Api/reviews",RouterReviews)
 app.use("/Api",RouterImage)
 app.use("/Api/bottem",RouterBottem)
+
+
 
 
 

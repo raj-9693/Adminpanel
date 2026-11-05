@@ -1,4 +1,5 @@
 import { Sparkles, Award, Layers, Image as ImageIcon, Quote, Heart } from "lucide-react";
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import SectionCard from "../components/editor/SectionCard.jsx";
 import SectionNav from "../components/editor/SectionNav.jsx";
@@ -15,6 +16,7 @@ import useSiteEditor from "../editor/useSiteEditor.js";
 import useTimeAgo from "../editor/useTimeAgo.js";
 import { validateHome } from "../editor/validateSite.js";
 import { uid } from "../editor/imageTools.js";
+import { getDetaHome, putDetaHome } from "../Apiservice/Homeservices.js";
 import "../styles/editor.css";
 import "../styles/siteEditor.css";
 
@@ -36,7 +38,84 @@ export default function HomePageEditor() {
   const ed = useSiteEditor({ pageKey: "home", order: ORDER, validate: validateHome });
   const ago = useTimeAgo(ed.lastSaved);
 
-  if (ed.loadState === "loading") return <Layout><div className="ed-page"><div className="ed-skel" /></div></Layout>;
+  // Sirf API se data load karo — koi dummy/default nahi dikhega
+  const [serverLoadState, setServerLoadState] = useState("idle"); // idle | loading | done | error
+  const [serverLoaded, setServerLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveToast, setSaveToast] = useState("");
+
+  useEffect(() => {
+    // useSiteEditor ready hone ka wait karo taake setPage kaam kare
+    if (ed.loadState !== "ready") return;
+    // Sirf ek baar fetch karo
+    if (serverLoaded) return;
+
+    setServerLoadState("loading");
+    getDetaHome()
+      .then((res) => {
+        const serverData = res?.data?.Deta;
+        if (!serverData) {
+          // Server par data nahi hai — empty fields dikhao, dummy nahi
+          ed.setPage({
+            hero:     { eyebrow: "", title: "", subtitle: "", primaryCta: "", secondaryCta: "", image: "", imageName: "", badge: "" },
+            stats:    { items: [] },
+            basics:   { eyebrow: "", title: "", linkText: "", items: [] },
+            glimpse:  { eyebrow: "", title: "", buttonText: "", items: [] },
+            reviews:  { eyebrow: "", title: "", items: [] },
+            promises: { items: [] },
+          });
+        } else {
+          // Sirf API ka data — koi merge nahi, koi dummy nahi
+          ed.setPage({
+            hero:     serverData.hero     ?? { eyebrow: "", title: "", subtitle: "", primaryCta: "", secondaryCta: "", image: "", imageName: "", badge: "" },
+            stats:    serverData.stats    ?? { items: [] },
+            basics:   serverData.basics   ?? { eyebrow: "", title: "", linkText: "", items: [] },
+            glimpse:  serverData.glimpse  ?? { eyebrow: "", title: "", buttonText: "", items: [] },
+            reviews:  serverData.reviews  ?? { eyebrow: "", title: "", items: [] },
+            promises: serverData.promises ?? { items: [] },
+          });
+        }
+        setServerLoaded(true);
+        setServerLoadState("done");
+      })
+      .catch((err) => {
+        console.error("[HomePageEditor] API call failed:", err);
+        setServerLoadState("error");
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ed.loadState]);
+
+  // Save: current draft ko server par PUT karo
+  const handleSave = async () => {
+    if (saving || !ed.draft) return;
+    setSaving(true);
+    setSaveToast("");
+    try {
+      await putDetaHome(ed.draft);
+      setSaveToast("Changes saved.");
+    } catch (err) {
+      setSaveToast("Save failed. Please try again.");
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSaveToast(""), 3200);
+    }
+  };
+
+  // Jab tak API ka data na aaye — loading skeleton dikhao
+  if (ed.loadState === "loading" || serverLoadState === "loading" || serverLoadState === "idle")
+    return <Layout><div className="ed-page"><div className="ed-skel" /></div></Layout>;
+
+  // API fail ho gayi — error dikhao, dummy nahi
+  if (serverLoadState === "error")
+    return (
+      <Layout><div className="ed-page"><div className="ed-state">
+        <p>Server se data load nahi hua. Backend check karo ya dobara try karo.</p>
+        <button type="button" className="ed-btn" onClick={() => { setServerLoaded(false); setServerLoadState("idle"); }}>
+          Try again
+        </button>
+      </div></div></Layout>
+    );
+
   if (ed.loadState === "error" || !ed.draft)
     return (
       <Layout><div className="ed-page"><div className="ed-state">
@@ -209,8 +288,8 @@ export default function HomePageEditor() {
       <div className="ed-page sx">
         <EditorToolbar
           crumb="Home page" title="Home page editor"
-          dirty={ed.dirty} saving={ed.saving} savedText={ago}
-          onSave={ed.save} onReset={ed.reset} siteUrl={SITE}
+          dirty={ed.dirty} saving={saving} savedText={saveToast || ago}
+          onSave={handleSave} onReset={ed.reset} siteUrl={SITE}
         />
 
         <EditorGrid>
