@@ -16,7 +16,7 @@ import useSiteEditor from "../editor/useSiteEditor.js";
 import useTimeAgo from "../editor/useTimeAgo.js";
 import { validateHome } from "../editor/validateSite.js";
 import { uid } from "../editor/imageTools.js";
-import { getDetaHome, putDetaHome } from "../Apiservice/Homeservices.js";
+import { getDetaHome, putDetaHome,postImageHome } from "../Apiservice/Homeservices.js";
 import "../styles/editor.css";
 import "../styles/siteEditor.css";
 
@@ -85,15 +85,56 @@ export default function HomePageEditor() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ed.loadState]);
 
-  // Save: current draft ko server par PUT karo
+  // Save: glimpse images upload karo → URL replace karo → phir PUT karo
   const handleSave = async () => {
     if (saving || !ed.draft) return;
     setSaving(true);
     setSaveToast("");
     try {
-      await putDetaHome(ed.draft);
+      let draft = { ...ed.draft };
+
+      // Glimpse items mein jo images base64 ya blob URL hain unhe ImageKit par upload karo
+      const updatedGlimpseItems = await Promise.all(
+        (draft.glimpse?.items || []).map(async (item) => {
+          // Sirf naya/local image upload karo — imagekit URL pehle se ho to skip karo
+          const isLocalImage =
+            item.image &&
+            (item.image.startsWith("data:") || item.image.startsWith("blob:"));
+
+          if (!isLocalImage) return item; // pehle se URL hai — kuch mat karo
+
+          try {
+            // base64 ko Blob mein convert karo taake FormData mein bhej sako
+            const blob = await (await fetch(item.image)).blob();
+            const file = new File([blob], item.imageName || "glimpse.jpg", { type: blob.type });
+
+            const res = await postImageHome(file);
+            const uploadedUrl = res?.data?.image;
+
+            if (uploadedUrl) {
+              return { ...item, image: uploadedUrl }; // local image → ImageKit URL
+            }
+          } catch (uploadErr) {
+            console.error(`[handleSave] Glimpse image upload failed for item ${item.id}:`, uploadErr);
+          }
+          return item; // upload fail ho to purana hi rakho
+        })
+      );
+
+      draft = {
+        ...draft,
+        glimpse: { ...draft.glimpse, items: updatedGlimpseItems },
+      };
+
+      // Ab updated draft (ImageKit URLs ke saath) server par save karo
+      await putDetaHome(draft);
+
+      // Draft update karo taake UI mein bhi URL reflect ho
+      ed.setPage(draft);
+
       setSaveToast("Changes saved.");
     } catch (err) {
+      console.error("[handleSave] Save failed:", err);
       setSaveToast("Save failed. Please try again.");
     } finally {
       setSaving(false);

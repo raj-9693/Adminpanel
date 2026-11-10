@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const Apiaxios=axios.create({
-    baseURL:"http://localhost:5000"
+    baseURL:"https://adminpanel-8x8v.onrender.com"
 })
 
 

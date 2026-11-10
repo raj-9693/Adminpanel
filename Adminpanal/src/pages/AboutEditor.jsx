@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Sparkles, UserRound, Hash, ListOrdered, MapPin, Briefcase, Users } from "lucide-react";
 import Layout from "../components/Layout";
 import SectionCard from "../components/editor/SectionCard.jsx";
@@ -14,6 +15,7 @@ import useSiteEditor from "../editor/useSiteEditor.js";
 import useTimeAgo from "../editor/useTimeAgo.js";
 import { validateAbout } from "../editor/validateSite.js";
 import { uid } from "../editor/imageTools.js";
+import { getDetaAbout, putDetaAbout, postImageAbout } from "../Apiservice/Aboutservices.js";
 import "../styles/editor.css";
 import "../styles/siteEditor.css";
 
@@ -21,13 +23,13 @@ const SITE = import.meta.env.VITE_SITE_URL || "http://localhost:5173";
 
 const ORDER = ["hero", "story", "numbers", "process", "artists", "travel", "kit"];
 const META = {
-  hero:    { icon: Sparkles,   nav: "Intro",   title: "Page intro",        sub: "Heading & welcome text" },
-  story:   { icon: UserRound,  nav: "Story",   title: "Artist’s note",     sub: "Portrait, personal story & key numbers" },
-  numbers: { icon: Hash,       nav: "Numbers", title: "Highlights band",   sub: "Four proof points on the maroon strip" },
-  process: { icon: ListOrdered,nav: "Process", title: "Our process",       sub: "Steps from first hello to final touch" },
-  artists: { icon: Users,      nav: "Artists", title: "Meet the artists",  sub: "Team cards with photo, role & specialities" },
-  travel:  { icon: MapPin,     nav: "Travel",  title: "Where we travel",   sub: "Text & list of cities" },
-  kit:     { icon: Briefcase,  nav: "Kit",     title: "Our kit",           sub: "Brands we use & skin-care note" },
+  hero:    { icon: Sparkles,    nav: "Intro",   title: "Page intro",        sub: "Heading & welcome text" },
+  story:   { icon: UserRound,   nav: "Story",   title: "Artist's note",     sub: "Portrait, personal story & key numbers" },
+  numbers: { icon: Hash,        nav: "Numbers", title: "Highlights band",   sub: "Four proof points on the maroon strip" },
+  process: { icon: ListOrdered, nav: "Process", title: "Our process",       sub: "Steps from first hello to final touch" },
+  artists: { icon: Users,       nav: "Artists", title: "Meet the artists",  sub: "Team cards with photo, role & specialities" },
+  travel:  { icon: MapPin,      nav: "Travel",  title: "Where we travel",   sub: "Text & list of cities" },
+  kit:     { icon: Briefcase,   nav: "Kit",     title: "Our kit",           sub: "Brands we use & skin-care note" },
 };
 const NAV = ORDER.map((id) => ({ id, label: META[id].nav, icon: META[id].icon }));
 
@@ -35,7 +37,128 @@ export default function AboutEditor() {
   const ed = useSiteEditor({ pageKey: "about", order: ORDER, validate: validateAbout });
   const ago = useTimeAgo(ed.lastSaved);
 
-  if (ed.loadState === "loading") return <Layout><div className="ed-page"><div className="ed-skel" /></div></Layout>;
+  // Server se data load karo — koi dummy nahi
+  const [serverLoadState, setServerLoadState] = useState("idle"); // idle | loading | done | error
+  const [serverLoaded, setServerLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveToast, setSaveToast] = useState("");
+
+  useEffect(() => {
+    if (ed.loadState !== "ready") return;
+    if (serverLoaded) return;
+
+    setServerLoadState("loading");
+    getDetaAbout()
+      .then((res) => {
+        const serverData = res?.data?.aboutdeta;
+        if (!serverData) {
+          // Server par data nahi — empty fields, dummy nahi
+          ed.setPage({
+            hero:    { eyebrow: "", title: "", text: "" },
+            story:   { eyebrow: "", title: "", image: "", imageName: "", quote: "", p1: "", p2: "", stats: [], button: "" },
+            numbers: { items: [] },
+            process: { eyebrow: "", title: "", items: [] },
+            artists: { eyebrow: "", title: "", note: "", items: [] },
+            travel:  { eyebrow: "", title: "", text: "", cities: [] },
+            kit:     { eyebrow: "", title: "", text: "", brands: [], note: "" },
+          });
+        } else {
+          // Sirf API ka data — koi merge nahi, koi dummy nahi
+          ed.setPage({
+            hero:    serverData.hero    ?? { eyebrow: "", title: "", text: "" },
+            story:   serverData.story   ?? { eyebrow: "", title: "", image: "", imageName: "", quote: "", p1: "", p2: "", stats: [], button: "" },
+            numbers: serverData.numbers ?? { items: [] },
+            process: serverData.process ?? { eyebrow: "", title: "", items: [] },
+            artists: serverData.artists ?? { eyebrow: "", title: "", note: "", items: [] },
+            travel:  serverData.travel  ?? { eyebrow: "", title: "", text: "", cities: [] },
+            kit:     serverData.kit     ?? { eyebrow: "", title: "", text: "", brands: [], note: "" },
+          });
+        }
+        setServerLoaded(true);
+        setServerLoadState("done");
+      })
+      .catch((err) => {
+        console.error("[AboutEditor] API call failed:", err);
+        setServerLoadState("error");
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ed.loadState]);
+
+  // Helper: local image (base64/blob) ko ImageKit par upload karo, URL wapas lo
+  const uploadIfLocal = async (imageUrl, imageName) => {
+    if (!imageUrl) return imageUrl;
+    const isLocal = imageUrl.startsWith("data:") || imageUrl.startsWith("blob:");
+    if (!isLocal) return imageUrl; // pehle se URL hai — skip
+
+    try {
+      const blob = await (await fetch(imageUrl)).blob();
+      const file = new File([blob], imageName || "about.jpg", { type: blob.type });
+      const res = await postImageAbout(file);
+      return res?.data?.image || imageUrl; // upload fail to purana hi rakho
+    } catch (uploadErr) {
+      console.error("[AboutEditor] Image upload failed:", uploadErr);
+      return imageUrl; // fail ho to purana hi rakho
+    }
+  };
+
+  // Save: story + artists images upload karo → URLs replace karo → phir PUT karo
+  const handleSave = async () => {
+    if (saving || !ed.draft) return;
+    setSaving(true);
+    setSaveToast("");
+    try {
+      let draft = { ...ed.draft };
+
+      // 1. story.image upload karo agar local hai
+      const storyImageUrl = await uploadIfLocal(draft.story?.image, draft.story?.imageName);
+      draft = {
+        ...draft,
+        story: { ...draft.story, image: storyImageUrl },
+      };
+
+      // 2. artists.items[].image upload karo agar local hai
+      const updatedArtists = await Promise.all(
+        (draft.artists?.items || []).map(async (artist) => {
+          const uploadedUrl = await uploadIfLocal(artist.image, artist.imageName);
+          return { ...artist, image: uploadedUrl };
+        })
+      );
+      draft = {
+        ...draft,
+        artists: { ...draft.artists, items: updatedArtists },
+      };
+
+      // 3. Updated draft (ImageKit URLs ke saath) server par save karo
+      await putDetaAbout(draft);
+
+      // 4. Draft update karo taake UI mein bhi URL reflect ho
+      ed.setPage(draft);
+
+      setSaveToast("Changes saved.");
+    } catch (err) {
+      console.error("[handleSave] Save failed:", err);
+      setSaveToast("Save failed. Please try again.");
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSaveToast(""), 3200);
+    }
+  };
+
+  // Jab tak API ka data na aaye — loading skeleton
+  if (ed.loadState === "loading" || serverLoadState === "loading" || serverLoadState === "idle")
+    return <Layout><div className="ed-page"><div className="ed-skel" /></div></Layout>;
+
+  // API fail ho gayi — error screen, dummy nahi
+  if (serverLoadState === "error")
+    return (
+      <Layout><div className="ed-page"><div className="ed-state">
+        <p>Server se data load nahi hua. Backend check karo ya dobara try karo.</p>
+        <button type="button" className="ed-btn" onClick={() => { setServerLoaded(false); setServerLoadState("idle"); }}>
+          Try again
+        </button>
+      </div></div></Layout>
+    );
+
   if (ed.loadState === "error" || !ed.draft)
     return (
       <Layout><div className="ed-page"><div className="ed-state">
@@ -84,7 +207,7 @@ export default function AboutEditor() {
         <Field label="Story title" max={60} value={p.story.title} onChange={(v) => upd("story", { title: v })} />
         <Field label="First paragraph" as="textarea" rows={4} max={320} value={p.story.p1} onChange={(v) => upd("story", { p1: v })} />
         <Field label="Second paragraph" as="textarea" rows={4} max={320} value={p.story.p2} onChange={(v) => upd("story", { p2: v })} />
-        {p.story.stats.map((s, i) => (
+        {(p.story.stats || []).map((s, i) => (
           <div key={s.id} className="sx-pair">
             <span className="sx-pair-n">{i + 1}</span>
             <Field label="Number" max={16} value={s.value} onChange={(v) => upd("story", { stats: patchIn(p.story.stats, s.id, { value: v }) })} />
@@ -97,14 +220,14 @@ export default function AboutEditor() {
 
     numbers: (
       <>
-        {p.numbers.items.map((n, i) => <div key={n.id}>{edit("numbers", `num-${n.id}`, (
+        {(p.numbers.items || []).map((n, i) => <div key={n.id}>{edit("numbers", `num-${n.id}`, (
           <div className="sx-pair">
             <span className="sx-pair-n">{i + 1}</span>
             <Field label="Number" max={12} value={n.value} onChange={(v) => upd("numbers", { items: patchIn(p.numbers.items, n.id, { value: v }) })} />
             <Field label="Label" max={28} value={n.label} onChange={(v) => upd("numbers", { items: patchIn(p.numbers.items, n.id, { label: v }) })} />
           </div>
         ))}</div>)}
-        <p className="fd-note">Type each number exactly as it should appear — “4.9/5”, “200+”, “1:1”.</p>
+        <p className="fd-note">Type each number exactly as it should appear — "4.9/5", "200+", "1:1".</p>
       </>
     ),
 
@@ -113,13 +236,13 @@ export default function AboutEditor() {
         <Field label="Small heading" caps max={50} value={p.process.eyebrow} onChange={(v) => upd("process", { eyebrow: v })} />
         <Field label="Section title" max={70} value={p.process.title} onChange={(v) => upd("process", { title: v })} />
         <div className="fd">
-          <span className="fd-label">Steps · {p.process.items.length}</span>
+          <span className="fd-label">Steps · {(p.process.items || []).length}</span>
           <ItemList
-            items={p.process.items}
+            items={p.process.items || []}
             onChange={(l) => upd("process", { items: l })}
             addLabel="Add step"
-            canAdd={p.process.items.length < 6}
-            canDelete={p.process.items.length > 1}
+            canAdd={(p.process.items || []).length < 6}
+            canDelete={(p.process.items || []).length > 1}
             makeNew={() => ({ id: uid(), title: "", text: "" })}
             summary={(s) => ({ thumb: <ListOrdered size={18} />, title: s.title || "New step", subtitle: s.text || "Describe this step" })}
             editor={(s, pt) => edit("process", `step-${s.id}`, (
@@ -140,13 +263,13 @@ export default function AboutEditor() {
         <Field label="Section title" as="textarea" rows={2} max={80} value={p.artists.title} onChange={(v) => upd("artists", { title: v })} />
         <Field label="Note (top right)" as="textarea" rows={2} max={160} value={p.artists.note} onChange={(v) => upd("artists", { note: v })} />
         <div className="fd">
-          <span className="fd-label">Artists · {p.artists.items.length}</span>
+          <span className="fd-label">Artists · {(p.artists.items || []).length}</span>
           <ItemList
-            items={p.artists.items}
+            items={p.artists.items || []}
             onChange={(l) => upd("artists", { items: l })}
             addLabel="Add artist"
-            canAdd={p.artists.items.length < 8}
-            canDelete={p.artists.items.length > 1}
+            canAdd={(p.artists.items || []).length < 8}
+            canDelete={(p.artists.items || []).length > 1}
             makeNew={() => ({ id: uid(), image: "", imageName: "", years: "", role: "", name: "", bio: "", tags: "" })}
             summary={(a) => ({
               thumb: a.image ? <img src={a.image} alt="" /> : <Users size={18} />,
@@ -176,8 +299,8 @@ export default function AboutEditor() {
         <Field label="Title" as="textarea" rows={2} max={80} value={p.travel.title} onChange={(v) => upd("travel", { title: v })} />
         <Field label="Text" as="textarea" rows={3} max={220} value={p.travel.text} onChange={(v) => upd("travel", { text: v })} />
         <div className="fd">
-          <span className="fd-label">Cities · {p.travel.cities.length}</span>
-          {labelList("travel", "cities", p.travel.cities, "city", 12)}
+          <span className="fd-label">Cities · {(p.travel.cities || []).length}</span>
+          {labelList("travel", "cities", p.travel.cities || [], "city", 12)}
         </div>
       </>
     ),
@@ -188,8 +311,8 @@ export default function AboutEditor() {
         <Field label="Title" as="textarea" rows={2} max={80} value={p.kit.title} onChange={(v) => upd("kit", { title: v })} />
         <Field label="Text" as="textarea" rows={2} max={160} value={p.kit.text} onChange={(v) => upd("kit", { text: v })} />
         <div className="fd">
-          <span className="fd-label">Brands · {p.kit.brands.length}</span>
-          {labelList("kit", "brands", p.kit.brands, "brand", 10)}
+          <span className="fd-label">Brands · {(p.kit.brands || []).length}</span>
+          {labelList("kit", "brands", p.kit.brands || [], "brand", 10)}
         </div>
         <Field label="Note at the bottom" as="textarea" rows={2} max={140} value={p.kit.note} onChange={(v) => upd("kit", { note: v })} />
       </>
@@ -201,8 +324,8 @@ export default function AboutEditor() {
       <div className="ed-page sx">
         <EditorToolbar
           crumb="About" title="About page editor"
-          dirty={ed.dirty} saving={ed.saving} savedText={ago}
-          onSave={ed.save} onReset={ed.reset} siteUrl={`${SITE}/about`}
+          dirty={ed.dirty} saving={saving} savedText={saveToast || ago}
+          onSave={handleSave} onReset={ed.reset} siteUrl={`${SITE}/about`}
         />
 
         <EditorGrid>

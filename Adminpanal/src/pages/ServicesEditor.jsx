@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Sparkles, Layers, ListOrdered, MessageCircle } from "lucide-react";
 import Layout from "../components/Layout";
 import SectionCard from "../components/editor/SectionCard.jsx";
@@ -15,6 +16,7 @@ import useSiteEditor from "../editor/useSiteEditor.js";
 import useTimeAgo from "../editor/useTimeAgo.js";
 import { validateServices } from "../editor/validateSite.js";
 import { uid } from "../editor/imageTools.js";
+import { getDetaServices, putDetaServices } from "../Apiservice/Services.js";
 import "../styles/editor.css";
 import "../styles/siteEditor.css";
 
@@ -23,9 +25,9 @@ const SITE = import.meta.env.VITE_SITE_URL || "http://localhost:5173";
 const ORDER = ["hero", "packages", "compare", "faq"];
 const META = {
   hero:     { icon: Sparkles,      nav: "Intro",    title: "Page intro",          sub: "Heading & welcome text" },
-  packages: { icon: Layers,        nav: "Packages", title: "Service packages",    sub: "Cards with photo, price & what’s included" },
-  compare:  { icon: ListOrdered,   nav: "Compare",  title: "Comparison table",    sub: "“At a glance” table of what each package includes" },
-  faq:      { icon: MessageCircle, nav: "FAQ",      title: "Questions & answers", sub: "“Before you book” questions" },
+  packages: { icon: Layers,        nav: "Packages", title: "Service packages",    sub: "Cards with photo, price & what's included" },
+  compare:  { icon: ListOrdered,   nav: "Compare",  title: "Comparison table",    sub: '"At a glance" table of what each package includes' },
+  faq:      { icon: MessageCircle, nav: "FAQ",      title: "Questions & answers", sub: '"Before you book" questions' },
 };
 const NAV = ORDER.map((id) => ({ id, label: META[id].nav, icon: META[id].icon }));
 const lineCount = (t) => String(t || "").split("\n").filter((x) => x.trim()).length;
@@ -34,7 +36,78 @@ export default function ServicesEditor() {
   const ed = useSiteEditor({ pageKey: "services", order: ORDER, validate: validateServices });
   const ago = useTimeAgo(ed.lastSaved);
 
-  if (ed.loadState === "loading") return <Layout><div className="ed-page"><div className="ed-skel" /></div></Layout>;
+  // Server se data load karo — koi dummy nahi
+  const [serverLoadState, setServerLoadState] = useState("idle"); // idle | loading | done | error
+  const [serverLoaded, setServerLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveToast, setSaveToast] = useState("");
+
+  useEffect(() => {
+    if (ed.loadState !== "ready") return;
+    if (serverLoaded) return;
+
+    setServerLoadState("loading");
+    getDetaServices()
+      .then((res) => {
+        const serverData = res?.data?.Services;
+        if (!serverData) {
+          // Server par data nahi — empty fields, dummy nahi
+          ed.setPage({
+            hero:     { eyebrow: "", title: "", text: "" },
+            packages: { note: "", badge: "", items: [] },
+            compare:  { eyebrow: "", title: "", note: "", tableLabel: "", priceRowLabel: "", rows: [] },
+            faq:      { eyebrow: "", title: "", text: "", button: "", items: [] },
+          });
+        } else {
+          // Sirf API ka data — koi merge nahi, koi dummy nahi
+          ed.setPage({
+            hero:     serverData.hero     ?? { eyebrow: "", title: "", text: "" },
+            packages: serverData.packages ?? { note: "", badge: "", items: [] },
+            compare:  serverData.compare  ?? { eyebrow: "", title: "", note: "", tableLabel: "", priceRowLabel: "", rows: [] },
+            faq:      serverData.faq      ?? { eyebrow: "", title: "", text: "", button: "", items: [] },
+          });
+        }
+        setServerLoaded(true);
+        setServerLoadState("done");
+      })
+      .catch((err) => {
+        console.error("[ServicesEditor] API call failed:", err);
+        setServerLoadState("error");
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ed.loadState]);
+
+  // Save: current draft ko server par PUT karo
+  const handleSave = async () => {
+    if (saving || !ed.draft) return;
+    setSaving(true);
+    setSaveToast("");
+    try {
+      await putDetaServices(ed.draft);
+      setSaveToast("Changes saved.");
+    } catch (err) {
+      setSaveToast("Save failed. Please try again.");
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSaveToast(""), 3200);
+    }
+  };
+
+  // Jab tak API ka data na aaye — loading skeleton
+  if (ed.loadState === "loading" || serverLoadState === "loading" || serverLoadState === "idle")
+    return <Layout><div className="ed-page"><div className="ed-skel" /></div></Layout>;
+
+  // API fail ho gayi — error screen, dummy nahi
+  if (serverLoadState === "error")
+    return (
+      <Layout><div className="ed-page"><div className="ed-state">
+        <p>Server se data load nahi hua. Backend check karo ya dobara try karo.</p>
+        <button type="button" className="ed-btn" onClick={() => { setServerLoaded(false); setServerLoadState("idle"); }}>
+          Try again
+        </button>
+      </div></div></Layout>
+    );
+
   if (ed.loadState === "error" || !ed.draft)
     return (
       <Layout><div className="ed-page"><div className="ed-state">
@@ -90,7 +163,7 @@ export default function ServicesEditor() {
                   <Field label="Starting price" max={14} placeholder="₹18,000" value={x.price} onChange={(v) => pt({ price: v })} />
                   <Field label="Word after price" max={14} placeholder="onwards" value={x.priceNote} onChange={(v) => pt({ priceNote: v })} />
                 </div>
-                <Field label="What’s included" as="textarea" rows={5} max={400} hint="One point per line" value={x.features} onChange={(v) => pt({ features: v })} />
+                <Field label="What's included" as="textarea" rows={5} max={400} hint="One point per line" value={x.features} onChange={(v) => pt({ features: v })} />
                 <Field label="Button text" max={20} hint="Leave empty to hide" value={x.button} onChange={(v) => pt({ button: v })} />
               </>
             ))}
@@ -125,7 +198,7 @@ export default function ServicesEditor() {
             }}
             editor={(r, pt) => edit("compare", `row-${r.id}`, (
               <>
-                <Field label="What’s included" max={40} placeholder="Personal consultation" value={r.label} onChange={(v) => pt({ label: v })} />
+                <Field label="What's included" max={40} placeholder="Personal consultation" value={r.label} onChange={(v) => pt({ label: v })} />
                 <div className="fd">
                   <span className="fd-label">Included in</span>
                   {pk.map((x) => (
@@ -173,8 +246,8 @@ export default function ServicesEditor() {
       <div className="ed-page sx">
         <EditorToolbar
           crumb="Services" title="Services page editor"
-          dirty={ed.dirty} saving={ed.saving} savedText={ago}
-          onSave={ed.save} onReset={ed.reset} siteUrl={`${SITE}/services`}
+          dirty={ed.dirty} saving={saving} savedText={saveToast || ago}
+          onSave={handleSave} onReset={ed.reset} siteUrl={`${SITE}/services`}
         />
 
         <EditorGrid>

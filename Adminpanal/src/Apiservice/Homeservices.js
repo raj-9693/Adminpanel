@@ -39,3 +39,30 @@ export const putDetaHome = async (data) => {
     throw err;
   }
 };
+
+// Image upload: ek File/Blob object lo, ImageKit pe upload karo, URL wapas lo
+// Parameter: imageFile — File object ya Blob (base64 nahi, actual file chahiye)
+export const postImageHome = async (imageFile) => {
+  const BaseUrl = "/Api/upload";
+  console.log(`🚀 [API START] - Calling POST-Upload (Image) | Endpoint: ${BaseUrl}`);
+  try {
+    const formData = new FormData();
+    formData.append("image", imageFile); // key "image" — backend multer yahi expect karta hai
+
+    const response = await Apiaxios.post(BaseUrl, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    console.log(`✅ [API SUCCESS] - Image Upload Successful | Status: ${response.status} | url: ${response.data?.image}`);
+    return response; // response.data.image = ImageKit URL
+  } catch (err) {
+    if (err.response) {
+      console.error(`❌ [API ERROR] - Image Upload Failed | Status: ${err.response?.status} | message: ${err.response?.data?.message}`);
+      console.error("🔍 [SERVER ERROR BODY]", JSON.stringify(err.response.data, null, 2));
+    } else {
+      console.error(`❌ [NETWORK ERROR] - postImageHome | ${err.message} || Check Network`);
+    }
+    throw err;
+  }
+};
+

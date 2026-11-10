@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Tag, Image as ImageIcon, Star, Upload } from "lucide-react";
 import Layout from "../components/Layout";
 import SectionCard from "../components/editor/SectionCard.jsx";
@@ -16,6 +16,7 @@ import useSiteEditor from "../editor/useSiteEditor.js";
 import useTimeAgo from "../editor/useTimeAgo.js";
 import { validateGallery } from "../editor/validateSite.js";
 import { compressImage, prettyName, uid } from "../editor/imageTools.js";
+import { getDetaGallery, putDetaGallery, postImageGallery } from "../Apiservice/Gallearyservices.js";
 import "../styles/editor.css";
 import "../styles/siteEditor.css";
 
@@ -33,9 +34,118 @@ const NAV = ORDER.map((id) => ({ id, label: META[id].nav, icon: META[id].icon })
 export default function GalleryEditor() {
   const ed = useSiteEditor({ pageKey: "gallery", order: ORDER, validate: validateGallery });
   const ago = useTimeAgo(ed.lastSaved);
-  const [bulk, setBulk] = useState(0); // kitni photos abhi process ho rahi hain
+  const [bulk, setBulk] = useState(0);
 
-  if (ed.loadState === "loading") return <Layout><div className="ed-page"><div className="ed-skel" /></div></Layout>;
+  // Server se data load karo — koi dummy nahi
+  const [serverLoadState, setServerLoadState] = useState("idle"); // idle | loading | done | error
+  const [serverLoaded, setServerLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveToast, setSaveToast] = useState("");
+
+  useEffect(() => {
+    if (ed.loadState !== "ready") return;
+    if (serverLoaded) return;
+
+    setServerLoadState("loading");
+    getDetaGallery()
+      .then((res) => {
+        const serverData = res?.data?.Gallery;
+        if (!serverData) {
+          // Server par data nahi — empty fields, dummy nahi
+          ed.setPage({
+            intro:   { eyebrow: "", title: "", text: "" },
+            filters: { allLabel: "", categories: [] },
+            items:   [],
+            focus:   { eyebrow: "", title: "", itemId: "", detailsLabel: "", buttonText: "" },
+          });
+        } else {
+          // Sirf API ka data — koi merge nahi, koi dummy nahi
+          ed.setPage({
+            intro:   serverData.intro   ?? { eyebrow: "", title: "", text: "" },
+            filters: serverData.filters ?? { allLabel: "", categories: [] },
+            items:   serverData.items   ?? [],
+            focus:   serverData.focus   ?? { eyebrow: "", title: "", itemId: "", detailsLabel: "", buttonText: "" },
+          });
+        }
+        setServerLoaded(true);
+        setServerLoadState("done");
+      })
+      .catch((err) => {
+        console.error("[GalleryEditor] API call failed:", err);
+        setServerLoadState("error");
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ed.loadState]);
+
+  // Save: gallery items ki images upload karo → URL replace karo → phir PUT karo
+  const handleSave = async () => {
+    if (saving || !ed.draft) return;
+    setSaving(true);
+    setSaveToast("");
+    try {
+      let draft = { ...ed.draft };
+
+      // Gallery items mein jo images base64 ya blob URL hain unhe ImageKit par upload karo
+      const updatedItems = await Promise.all(
+        (draft.items || []).map(async (item) => {
+          // Sirf naya/local image upload karo — imagekit URL pehle se ho to skip karo
+          const isLocalImage =
+            item.image &&
+            (item.image.startsWith("data:") || item.image.startsWith("blob:"));
+
+          if (!isLocalImage) return item; // pehle se URL hai — kuch mat karo
+
+          try {
+            // base64/blob ko Blob mein convert karo taake FormData mein bhej sako
+            const blob = await (await fetch(item.image)).blob();
+            const file = new File([blob], item.imageName || "gallery.jpg", { type: blob.type });
+
+            const res = await postImageGallery(file);
+            const uploadedUrl = res?.data?.image;
+
+            if (uploadedUrl) {
+              return { ...item, image: uploadedUrl }; // local image → ImageKit URL
+            }
+          } catch (uploadErr) {
+            console.error(`[handleSave] Gallery image upload failed for item ${item.id}:`, uploadErr);
+          }
+          return item; // upload fail ho to purana hi rakho
+        })
+      );
+
+      draft = { ...draft, items: updatedItems };
+
+      // Ab updated draft (ImageKit URLs ke saath) server par save karo
+      await putDetaGallery(draft);
+
+      // Draft update karo taake UI mein bhi URL reflect ho
+      ed.setPage(draft);
+
+      setSaveToast("Changes saved.");
+    } catch (err) {
+      console.error("[handleSave] Save failed:", err);
+      setSaveToast("Save failed. Please try again.");
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSaveToast(""), 3200);
+    }
+  };
+
+  // Jab tak API ka data na aaye — loading skeleton
+  if (ed.loadState === "loading" || serverLoadState === "loading" || serverLoadState === "idle")
+    return <Layout><div className="ed-page"><div className="ed-skel" /></div></Layout>;
+
+  // API fail ho gayi — error screen, dummy nahi
+  if (serverLoadState === "error")
+    return (
+      <Layout><div className="ed-page"><div className="ed-state">
+        <p>Server se data load nahi hua. Backend check karo ya dobara try karo.</p>
+        <button type="button" className="ed-btn" onClick={() => { setServerLoaded(false); setServerLoadState("idle"); }}>
+          Try again
+        </button>
+      </div></div></Layout>
+    );
+
   if (ed.loadState === "error" || !ed.draft)
     return (
       <Layout><div className="ed-page"><div className="ed-state">
@@ -156,19 +266,19 @@ export default function GalleryEditor() {
               <>
                 <PhotoField label="Photo" hint="Portrait photo (3:4) works best" src={it.image} name={it.imageName}
                   onChange={(v) => pt({ image: v.src, imageName: v.name })} />
-                <Field label="Title / tagline" max={50} placeholder="Rhea’s palace vows" value={it.title} onChange={(v) => pt({ title: v })} />
+                <Field label="Title / tagline" max={50} placeholder="Rhea's palace vows" value={it.title} onChange={(v) => pt({ title: v })} />
                 <Field label="Category tag" as="select" options={catOptions} value={it.category} onChange={(v) => pt({ category: v })} />
                 <Field label="Detailed description" as="textarea" rows={4} max={260}
-                  hint="Shown in the big “In focus” view" value={it.description} onChange={(v) => pt({ description: v })} />
+                  hint='Shown in the big "In focus" view' value={it.description} onChange={(v) => pt({ description: v })} />
                 <Field label="Look details" max={80} placeholder="Bridal makeup · Soft cooling · Organza setting"
-                  hint="One short line, separate parts with “ · ”" value={it.details} onChange={(v) => pt({ details: v })} />
+                  hint='One short line, separate parts with " · "' value={it.details} onChange={(v) => pt({ details: v })} />
                 {it.published && p.focus.itemId !== it.id && (
                   <button type="button" className="ed-link sx-left-link"
                     onClick={() => { upd("focus", { itemId: it.id }); ed.focusSection("focus"); }}>
-                    Show this look in the “In focus” section
+                    Show this look in the "In focus" section
                   </button>
                 )}
-                {p.focus.itemId === it.id && <p className="fd-note">This look is currently shown in the “In focus” section.</p>}
+                {p.focus.itemId === it.id && <p className="fd-note">This look is currently shown in the "In focus" section.</p>}
               </>
             ))}
           />
@@ -195,8 +305,8 @@ export default function GalleryEditor() {
       <div className="ed-page sx">
         <EditorToolbar
           crumb="Gallery" title="Gallery page editor"
-          dirty={ed.dirty} saving={ed.saving} savedText={ago}
-          onSave={ed.save} onReset={ed.reset} siteUrl={`${SITE}/gallery`}
+          dirty={ed.dirty} saving={saving} savedText={saveToast || ago}
+          onSave={handleSave} onReset={ed.reset} siteUrl={`${SITE}/gallery`}
         />
 
         <EditorGrid>
