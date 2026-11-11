@@ -16,7 +16,7 @@ import useSiteEditor from "../editor/useSiteEditor.js";
 import useTimeAgo from "../editor/useTimeAgo.js";
 import { validateServices } from "../editor/validateSite.js";
 import { uid } from "../editor/imageTools.js";
-import { getDetaServices, putDetaServices } from "../Apiservice/Services.js";
+import { getDetaServices, putDetaServices, postImageServices } from "../Apiservice/Services.js";
 import "../styles/editor.css";
 import "../styles/siteEditor.css";
 
@@ -77,15 +77,46 @@ export default function ServicesEditor() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ed.loadState]);
 
-  // Save: current draft ko server par PUT karo
+  // Save: packages images upload karo → URLs replace karo → phir PUT karo
   const handleSave = async () => {
     if (saving || !ed.draft) return;
     setSaving(true);
     setSaveToast("");
     try {
-      await putDetaServices(ed.draft);
+      let draft = { ...ed.draft };
+
+      // packages.items[].image — local base64/blob ho to ImageKit par upload karo
+      const updatedPackages = await Promise.all(
+        (draft.packages?.items || []).map(async (pkg) => {
+          const isLocal =
+            pkg.image &&
+            (pkg.image.startsWith("data:") || pkg.image.startsWith("blob:"));
+
+          if (!isLocal) return pkg; // pehle se URL hai — skip
+
+          try {
+            const blob = await (await fetch(pkg.image)).blob();
+            const file = new File([blob], pkg.imageName || "service.jpg", { type: blob.type });
+            const res = await postImageServices(file);
+            const uploadedUrl = res?.data?.image;
+            if (uploadedUrl) return { ...pkg, image: uploadedUrl };
+          } catch (uploadErr) {
+            console.error(`[ServicesEditor] Image upload failed for pkg ${pkg.id}:`, uploadErr);
+          }
+          return pkg; // upload fail ho to purana hi rakho
+        })
+      );
+
+      draft = {
+        ...draft,
+        packages: { ...draft.packages, items: updatedPackages },
+      };
+
+      await putDetaServices(draft);
+      ed.setPage(draft);
       setSaveToast("Changes saved.");
     } catch (err) {
+      console.error("[handleSave] Save failed:", err);
       setSaveToast("Save failed. Please try again.");
     } finally {
       setSaving(false);
